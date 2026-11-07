@@ -24,7 +24,7 @@ model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
-  password  String
+  password  String?
   bio       String?
   location  String?
   avatar    String?
