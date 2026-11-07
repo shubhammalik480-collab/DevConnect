@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +12,12 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model User {
@@ -23,4 +30,81 @@ model User {
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  projects             Project[]
+  blogPosts            BlogPost[]
+  skills               Skill[]
+  endorsementsGiven    Endorsement[] @relation("GivenEndorsements")
+  endorsementsReceived Endorsement[] @relation("ReceivedEndorsements")
+  sentConnections      Connection[]  @relation("ConnectionRequester")
+  receivedConnections Connection[]  @relation("ConnectionReceiver")
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  techStack    String[]
+  liveUrl      String?
+  repositoryUrl String?
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  excerpt   String?
+  coverImage String?
+  published Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String
+  level     String?
+  userId    String
+  createdAt DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endorsements Endorsement[]
+
+  @@unique([userId, name])
+}
+
+model Endorsement {
+  id         String   @id @default(cuid())
+  message    String?
+  fromUserId String
+  toUserId   String
+  skillId    String
+  createdAt  DateTime @default(now())
+
+  fromUser User  @relation("GivenEndorsements", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User  @relation("ReceivedEndorsements", fields: [toUserId], references: [id], onDelete: Cascade)
+  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+}
+
+model Connection {
+  id          String           @id @default(cuid())
+  requesterId String
+  receiverId  String
+  status      ConnectionStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  requester User @relation("ConnectionRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver  User @relation("ConnectionReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
 }
