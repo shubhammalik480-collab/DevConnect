@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import passport from "../config/passport";
 import { protect } from "../middleware/auth.middleware";
@@ -7,6 +6,7 @@ import {
   register,
   login,
   githubCallback,
+  logout,
 } from "../controllers/auth.controller";
 
 const router = Router();
@@ -16,6 +16,9 @@ router.post("/register", register);
 
 // User Login
 router.post("/login", login);
+
+// User Logout
+router.post("/logout", logout);
 
 // GitHub OAuth Login
 router.get(
@@ -35,6 +38,8 @@ router.get(
   }),
   githubCallback
 );
+
+// Check Authentication
 router.get("/profile", protect, (req, res) => {
   res.json({
     success: true,
