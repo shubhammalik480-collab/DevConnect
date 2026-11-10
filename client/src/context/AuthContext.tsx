@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { loginUser, registerUser } from "../services/auth.service";
+
+import {
+  loginUser,
+  registerUser,
+} from "../services/auth.service";
 
 export interface User {
   id: string;
@@ -15,9 +19,18 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
+
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+
+  register: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
+
   logout: () => Promise<void>;
+
+  updateUser: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,31 +75,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Register
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string
+  ) => {
     const response = await registerUser(name, email, password);
     setUser(response.data);
   };
 
   // Logout
   const logout = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/logout",
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
+    const response = await fetch(
+      "http://localhost:5000/api/auth/logout",
+      {
+        method: "POST",
+        credentials: "include",
       }
+    );
 
-      setUser(null);
-    } catch (error) {
-      console.error("Logout error:", error);
-      throw error;
+    if (!response.ok) {
+      throw new Error("Logout failed");
     }
+
+    setUser(null);
+  };
+
+  // Update global user information
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
   };
 
   return (
@@ -98,6 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         login,
         register,
         logout,
+        updateUser,
       }}
     >
       {children}

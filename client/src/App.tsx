@@ -147,39 +147,12 @@
 
 // export default App;
 
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
-
-const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/login");
-    } catch (error) {
-      alert("Logout failed. Please try again.");
-    }
-  };
-
-  return (
-    <div>
-      <h1>Welcome to DevConnect Dashboard!</h1>
-
-      <h2>Hello, {user?.name}</h2>
-      <p>Email: {user?.email}</p>
-
-      <button onClick={handleLogout}>
-        Logout
-      </button>
-    </div>
-  );
-};
 
 function App() {
   return (
@@ -188,7 +161,7 @@ function App() {
       <Route path="/register" element={<Register />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Profile />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

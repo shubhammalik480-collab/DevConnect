@@ -1,0 +1,365 @@
+/* ==============================
+   GLOBAL PROFILE STYLING
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+.profile-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 25px;
+  color: #1e293b;
+  font-family: Arial, sans-serif;
+}
+
+/* ==============================
+   NAVBAR
+================================ */
+
+.profile-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px;
+  margin-bottom: 30px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.profile-navbar h2 {
+  color: #2563eb;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.logout-btn {
+  padding: 10px 22px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* ==============================
+   HERO SECTION
+================================ */
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  padding: 40px;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.05);
+}
+
+.profile-avatar img,
+.avatar-placeholder {
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 5px 18px rgba(37, 99, 235, 0.2);
+}
+
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: white;
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.profile-info h1 {
+  font-size: 34px;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.profile-info p {
+  margin: 9px 0;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.profile-info button {
+  margin-top: 15px;
+  padding: 11px 25px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.profile-info button:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+/* ==============================
+   COMMON SECTION
+================================ */
+
+.profile-section {
+  margin-top: 30px;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.profile-section h2 {
+  margin-bottom: 22px;
+  font-size: 24px;
+  color: #0f172a;
+}
+
+/* ==============================
+   FORMS
+================================ */
+
+.profile-section form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.profile-section input,
+.profile-section textarea,
+.profile-section select {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+.profile-section textarea {
+  resize: vertical;
+}
+
+.profile-section input:focus,
+.profile-section textarea:focus,
+.profile-section select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.profile-section form button {
+  padding: 12px 22px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.profile-section form button:hover {
+  background: #1d4ed8;
+}
+
+.profile-section form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==============================
+   SKILLS GRID
+================================ */
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.skill-card {
+  padding: 20px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.skill-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+}
+
+.skill-card h3 {
+  margin-bottom: 8px;
+  color: #1d4ed8;
+  font-size: 17px;
+}
+
+.skill-card p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ==============================
+   PROJECTS GRID
+================================ */
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.project-card {
+  padding: 24px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  transition: 0.3s;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  border-color: #93c5fd;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+}
+
+.project-card h3 {
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #1d4ed8;
+}
+
+.project-card p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+/* Project Tech Stack */
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.project-tags span {
+  padding: 6px 11px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Project Links */
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.project-links a {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-links a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 15px;
+  }
+
+  .profile-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .profile-info h1 {
+    font-size: 27px;
+  }
+
+  .profile-section {
+    padding: 22px;
+  }
+
+  .profile-section form {
+    flex-direction: column;
+  }
+
+  .profile-section input,
+  .profile-section textarea,
+  .profile-section select,
+  .profile-section form button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-navbar {
+    padding: 15px;
+  }
+
+  .profile-navbar h2 {
+    font-size: 21px;
+  }
+
+  .profile-avatar img,
+  .avatar-placeholder {
+    width: 125px;
+    height: 125px;
+  }
+
+  .profile-section h2 {
+    font-size: 21px;
+  }
+
+  .skills-grid,
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
