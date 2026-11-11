@@ -318,15 +318,21 @@ const Profile = () => {
 
       {/* Navbar */}
       <nav className="profile-navbar">
-        <h2>DevConnect</h2>
+  <h2>DevConnect</h2>
 
-        <button
-          className="logout-btn"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </nav>
+  <div>
+    <button onClick={() => navigate("/blogs")}>
+      Blogs
+    </button>
+
+    <button
+      className="logout-btn"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
+  </div>
+</nav>
 
       {/* Hero Section */}
       <section className="profile-hero">
