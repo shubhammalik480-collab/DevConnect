@@ -179,7 +179,6 @@ const Profile = () => {
         ...previousProjects,
       ]);
 
-      // Reset form
       setProjectTitle("");
       setProjectDescription("");
       setProjectTechStack("");
@@ -219,7 +218,6 @@ const Profile = () => {
     setError("");
 
     try {
-      // Update profile information
       const response = await fetch(
         `${API_URL}/users/profile`,
         {
@@ -318,21 +316,25 @@ const Profile = () => {
 
       {/* Navbar */}
       <nav className="profile-navbar">
-  <h2>DevConnect</h2>
+        <h2>DevConnect</h2>
 
-  <div>
-    <button onClick={() => navigate("/blogs")}>
-      Blogs
-    </button>
+        <div>
+          <button onClick={() => navigate("/blogs")}>
+            Blogs
+          </button>
 
-    <button
-      className="logout-btn"
-      onClick={handleLogout}
-    >
-      Logout
-    </button>
-  </div>
-</nav>
+          <button onClick={() => navigate("/developers")}>
+            Developers
+          </button>
+
+          <button
+            className="logout-btn"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </nav>
 
       {/* Hero Section */}
       <section className="profile-hero">
@@ -456,7 +458,6 @@ const Profile = () => {
 
         <h2>My Skills</h2>
 
-        {/* Add Skill Form */}
         <form onSubmit={handleAddSkill}>
 
           <input
@@ -490,7 +491,6 @@ const Profile = () => {
           </p>
         )}
 
-        {/* Skills Grid */}
         {skillsLoading ? (
           <p>Loading skills...</p>
         ) : skills.length === 0 ? (
@@ -523,7 +523,6 @@ const Profile = () => {
 
         <h2>My Projects</h2>
 
-        {/* Add Project Form */}
         <form onSubmit={handleAddProject}>
 
           <input
@@ -588,7 +587,6 @@ const Profile = () => {
           </p>
         )}
 
-        {/* Dynamic Projects Grid */}
         {projectsLoading ? (
           <p>Loading projects...</p>
         ) : projects.length === 0 ? (

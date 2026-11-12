@@ -46,7 +46,6 @@ export const getProfile = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.userId;
-
     const { name, bio, location, avatar } = req.body;
 
     const updatedUser = await prisma.user.update({
@@ -105,6 +104,7 @@ export const deleteProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
 // UPLOAD PROFILE IMAGE
 export const uploadProfileImage = async (req: Request, res: Response) => {
   try {
@@ -143,6 +143,149 @@ export const uploadProfileImage = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Failed to upload profile image",
+    });
+  }
+};
+
+// GET ALL DEVELOPERS + SEARCH
+export const getDevelopers = async (req: Request, res: Response) => {
+  try {
+    const search =
+      typeof req.query.search === "string" ? req.query.search.trim() : "";
+
+    const userId = res.locals.userId;
+
+    const developers = await prisma.user.findMany({
+      where: {
+        id: { not: userId },
+        ...(search && {
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              location: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              skills: {
+                some: {
+                  name: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          ],
+        }),
+      },
+      select: {
+        id: true,
+        name: true,
+        bio: true,
+        location: true,
+        avatar: true,
+        createdAt: true,
+        skills: {
+          select: {
+            id: true,
+            name: true,
+            level: true,
+          },
+        },
+        _count: {
+          select: {
+            projects: true,
+            blogPosts: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Developers fetched successfully",
+      count: developers.length,
+      data: developers,
+    });
+  } catch (error) {
+    console.error("Get Developers Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch developers",
+    });
+  }
+};
+
+// GET SINGLE DEVELOPER PROFILE
+export const getDeveloperById = async (req: Request, res: Response) => {
+  try {
+    const id = String(req.params.id);
+
+    const developer = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        bio: true,
+        location: true,
+        avatar: true,
+        createdAt: true,
+        skills: {
+          select: {
+            id: true,
+            name: true,
+            level: true,
+          },
+        },
+        projects: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            techStack: true,
+            liveUrl: true,
+            repositoryUrl: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: {
+            projects: true,
+            blogPosts: true,
+          },
+        },
+      },
+    });
+
+    if (!developer) {
+      return res.status(404).json({
+        success: false,
+        message: "Developer not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Developer profile fetched successfully",
+      data: developer,
+    });
+  } catch (error) {
+    console.error("Get Developer Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch developer profile",
     });
   }
 };
