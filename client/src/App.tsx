@@ -11,7 +11,7 @@ import EditBlog from "./pages/EditBlog";
 
 import Developers from "./pages/Developers";
 import DeveloperProfile from "./pages/DeveloperProfile";
-
+import Connections from "./pages/Connection";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -37,6 +37,8 @@ function App() {
           path="/developers/:id"
           element={<DeveloperProfile />}
         />
+        {/* Connection Routes */}
+<Route path="/connections" element={<Connections />} />
       </Route>
 
       {/* Fallback */}

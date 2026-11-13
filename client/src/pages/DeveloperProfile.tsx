@@ -6,12 +6,24 @@ import {
   type DeveloperProfile as DeveloperData,
 } from "../services/developer.service";
 
+import {
+  getMutualConnections,
+  type ConnectionDeveloper,
+} from "../services/connection.service";
+
+import { useAuth } from "../context/AuthContext";
+
 const DeveloperProfile = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
 
   const [developer, setDeveloper] = useState<DeveloperData | null>(null);
+  const [mutualConnections, setMutualConnections] = useState<ConnectionDeveloper[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [mutualLoading, setMutualLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mutualError, setMutualError] = useState("");
 
   useEffect(() => {
     const fetchDeveloper = async () => {
@@ -25,6 +37,29 @@ const DeveloperProfile = () => {
 
         const data = await getDeveloperById(id);
         setDeveloper(data);
+
+        // Mutual connections are not requested on your own profile.
+        if (data.id === user?.id) {
+          setMutualConnections([]);
+          setMutualLoading(false);
+          return;
+        }
+
+        setMutualLoading(true);
+        setMutualError("");
+
+        try {
+          const mutualData = await getMutualConnections(data.id);
+          setMutualConnections(mutualData);
+        } catch (err) {
+          setMutualError(
+            err instanceof Error
+              ? err.message
+              : "Failed to load mutual connections"
+          );
+        } finally {
+          setMutualLoading(false);
+        }
       } catch (err) {
         setError(
           err instanceof Error
@@ -37,12 +72,14 @@ const DeveloperProfile = () => {
     };
 
     fetchDeveloper();
-  }, [id]);
+  }, [id, user?.id]);
 
   if (loading) {
-    return <h2 style={{ textAlign: "center", marginTop: "80px" }}>
-      Loading developer profile...
-    </h2>;
+    return (
+      <h2 style={{ textAlign: "center", marginTop: "80px" }}>
+        Loading developer profile...
+      </h2>
+    );
   }
 
   if (error || !developer) {
@@ -63,7 +100,6 @@ const DeveloperProfile = () => {
       }}
     >
       <div style={{ maxWidth: "1000px", margin: "auto" }}>
-
         <Link
           to="/developers"
           style={{
@@ -144,6 +180,10 @@ const DeveloperProfile = () => {
               label: "Blog Posts",
               value: developer._count.blogPosts,
             },
+            {
+              label: "Mutual Connections",
+              value: mutualConnections.length,
+            },
           ].map((item) => (
             <div
               key={item.label}
@@ -162,6 +202,85 @@ const DeveloperProfile = () => {
             </div>
           ))}
         </div>
+
+        {/* Mutual Connections */}
+        <section
+          style={{
+            background: "white",
+            padding: "25px",
+            borderRadius: "14px",
+            marginTop: "25px",
+          }}
+        >
+          <h2>🤝 Mutual Connections</h2>
+
+          {mutualLoading ? (
+            <p style={{ color: "#64748b" }}>
+              Loading mutual connections...
+            </p>
+          ) : mutualError ? (
+            <p style={{ color: "#dc2626" }}>{mutualError}</p>
+          ) : mutualConnections.length === 0 ? (
+            <p style={{ color: "#64748b" }}>
+              No mutual connections yet.
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                gap: "15px",
+                marginTop: "20px",
+              }}
+            >
+              {mutualConnections.map((person) => (
+                <div
+                  key={person.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "15px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <img
+                    src={
+                      person.avatar ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        person.name
+                      )}&background=random`
+                    }
+                    alt={person.name}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+
+                  <div>
+                    <h4 style={{ margin: "0 0 5px", color: "#1e293b" }}>
+                      {person.name}
+                    </h4>
+
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "12px",
+                        color: "#64748b",
+                      }}
+                    >
+                      {person.location || "Location not added"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* Skills */}
         <section
@@ -284,7 +403,6 @@ const DeveloperProfile = () => {
             </div>
           )}
         </section>
-
       </div>
     </div>
   );

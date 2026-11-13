@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:5000/api/users/developers";
+const CONNECTION_API_URL = "http://localhost:5000/api/connections";
 
 export interface Developer {
   id: string;
@@ -71,4 +72,25 @@ export const getDeveloperById = async (
   }
 
   return result.data;
+};
+
+// Send Connection Request
+export const sendConnectionRequest = async (
+  developerId: string
+): Promise<string> => {
+  const response = await fetch(
+    `${CONNECTION_API_URL}/request/${encodeURIComponent(developerId)}`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to send connection request");
+  }
+
+  return result.message || "Connection request sent successfully";
 };

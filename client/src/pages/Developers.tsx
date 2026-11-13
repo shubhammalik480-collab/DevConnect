@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import {
   getDevelopers,
+  sendConnectionRequest,
   type Developer,
 } from "../services/developer.service";
 
@@ -11,6 +12,10 @@ const Developers = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sentRequests, setSentRequests] = useState<string[]>([]);
+  const [connectionError, setConnectionError] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,6 +40,25 @@ const Developers = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConnect = async (developerId: string) => {
+    try {
+      setSendingId(developerId);
+      setConnectionError("");
+
+      await sendConnectionRequest(developerId);
+
+      setSentRequests((previous) => [...previous, developerId]);
+    } catch (err) {
+      setConnectionError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send connection request"
+      );
+    } finally {
+      setSendingId(null);
     }
   };
 
@@ -91,6 +115,21 @@ const Developers = () => {
             </p>
           )}
         </div>
+
+        {/* Connection Error */}
+        {connectionError && (
+          <p
+            style={{
+              color: "#dc2626",
+              background: "#fee2e2",
+              padding: "12px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            {connectionError}
+          </p>
+        )}
 
         {/* Loading */}
         {loading && (
@@ -243,10 +282,45 @@ const Developers = () => {
                     borderRadius: "8px",
                     textDecoration: "none",
                     fontWeight: "600",
+                    marginBottom: "10px",
                   }}
                 >
                   View Profile
                 </Link>
+
+                {/* Connect Button */}
+                <button
+                  onClick={() => handleConnect(developer.id)}
+                  disabled={
+                    sentRequests.includes(developer.id) ||
+                    sendingId === developer.id
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: sentRequests.includes(developer.id)
+                      ? "#dcfce7"
+                      : "#0f172a",
+                    color: sentRequests.includes(developer.id)
+                      ? "#15803d"
+                      : "white",
+                    fontWeight: "600",
+                    cursor:
+                      sentRequests.includes(developer.id) ||
+                      sendingId === developer.id
+                        ? "not-allowed"
+                        : "pointer",
+                    opacity: sendingId === developer.id ? 0.7 : 1,
+                  }}
+                >
+                  {sendingId === developer.id
+                    ? "Sending..."
+                    : sentRequests.includes(developer.id)
+                    ? "Request Sent ✓"
+                    : "Connect +"}
+                </button>
               </div>
             ))}
           </div>

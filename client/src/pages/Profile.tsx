@@ -326,6 +326,9 @@ const Profile = () => {
           <button onClick={() => navigate("/developers")}>
             Developers
           </button>
+          <button onClick={() => navigate("/connections")}>
+           Connections
+          </button>
 
           <button
             className="logout-btn"

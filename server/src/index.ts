@@ -8,6 +8,7 @@ import userRoutes from "./routes/user.routes";
 import projectRoutes from "./routes/project.routes";
 import skillRoutes from "./routes/skill.routes";
 import blogRoutes from "./routes/blog.routes";
+import connectionRoutes from "./routes/connection.routes";
 
 import passport from "./config/passport";
 
@@ -41,6 +42,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/connections", connectionRoutes);
 
 // Start Server
 app.listen(PORT, () => {
