@@ -3,7 +3,11 @@ import { Link, useParams } from "react-router-dom";
 
 import {
   getDeveloperById,
+  getUserSkillsWithEndorsements,
+  endorseSkill,
+  removeEndorsement,
   type DeveloperProfile as DeveloperData,
+  type SkillWithEndorsements,
 } from "../services/developer.service";
 
 import {
@@ -18,27 +22,68 @@ const DeveloperProfile = () => {
   const { user } = useAuth();
 
   const [developer, setDeveloper] = useState<DeveloperData | null>(null);
-  const [mutualConnections, setMutualConnections] = useState<ConnectionDeveloper[]>([]);
+
+  const [skills, setSkills] = useState<SkillWithEndorsements[]>([]);
+
+  const [mutualConnections, setMutualConnections] = useState<
+    ConnectionDeveloper[]
+  >([]);
 
   const [loading, setLoading] = useState(true);
   const [mutualLoading, setMutualLoading] = useState(true);
+  const [endorsementLoading, setEndorsementLoading] = useState(true);
+
   const [error, setError] = useState("");
   const [mutualError, setMutualError] = useState("");
+  const [endorsementError, setEndorsementError] = useState("");
+  const [actionError, setActionError] = useState("");
+
+  const [processingSkillId, setProcessingSkillId] = useState<string | null>(
+    null
+  );
+
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // ==========================================
+  // FETCH DEVELOPER PROFILE
+  // ==========================================
 
   useEffect(() => {
     const fetchDeveloper = async () => {
-      try {
-        if (!id) {
-          throw new Error("Developer ID is missing");
-        }
+      if (!id) {
+        setError("Developer ID is missing");
+        setLoading(false);
+        return;
+      }
 
+      try {
         setLoading(true);
         setError("");
 
         const data = await getDeveloperById(id);
         setDeveloper(data);
 
-        // Mutual connections are not requested on your own profile.
+        // Fetch skills and endorsements
+        setEndorsementLoading(true);
+        setEndorsementError("");
+
+        try {
+          const endorsementData = await getUserSkillsWithEndorsements(
+            data.id
+          );
+
+          setSkills(endorsementData);
+        } catch (err) {
+          setEndorsementError(
+            err instanceof Error
+              ? err.message
+              : "Failed to load endorsements"
+          );
+        } finally {
+          setEndorsementLoading(false);
+        }
+
+        // Mutual connections are not requested on own profile.
         if (data.id === user?.id) {
           setMutualConnections([]);
           setMutualLoading(false);
@@ -74,6 +119,67 @@ const DeveloperProfile = () => {
     fetchDeveloper();
   }, [id, user?.id]);
 
+  // ==========================================
+  // ENDORSE SKILL
+  // ==========================================
+
+  const handleEndorse = async (skillId: string) => {
+    try {
+      setProcessingSkillId(skillId);
+      setActionError("");
+      setSuccessMessage("");
+
+      await endorseSkill(skillId);
+
+      // Refresh skills and endorsement counts
+      const updatedSkills = await getUserSkillsWithEndorsements(
+        developer!.id
+      );
+
+      setSkills(updatedSkills);
+      setSuccessMessage("Skill endorsed successfully!");
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Failed to endorse skill"
+      );
+    } finally {
+      setProcessingSkillId(null);
+    }
+  };
+
+  // ==========================================
+  // REMOVE ENDORSEMENT
+  // ==========================================
+
+  const handleRemoveEndorsement = async (skillId: string) => {
+    try {
+      setProcessingSkillId(skillId);
+      setActionError("");
+      setSuccessMessage("");
+
+      await removeEndorsement(skillId);
+
+      const updatedSkills = await getUserSkillsWithEndorsements(
+        developer!.id
+      );
+
+      setSkills(updatedSkills);
+      setSuccessMessage("Endorsement removed successfully!");
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Failed to remove endorsement"
+      );
+    } finally {
+      setProcessingSkillId(null);
+    }
+  };
+
+  // ==========================================
+  // LOADING STATE
+  // ==========================================
+
   if (loading) {
     return (
       <h2 style={{ textAlign: "center", marginTop: "80px" }}>
@@ -81,6 +187,10 @@ const DeveloperProfile = () => {
       </h2>
     );
   }
+
+  // ==========================================
+  // ERROR STATE
+  // ==========================================
 
   if (error || !developer) {
     return (
@@ -90,6 +200,17 @@ const DeveloperProfile = () => {
       </div>
     );
   }
+
+  const totalEndorsements = skills.reduce(
+    (total, skill) => total + skill._count.endorsements,
+    0
+  );
+
+  const isOwnProfile = developer.id === user?.id;
+
+  // ==========================================
+  // MAIN UI
+  // ==========================================
 
   return (
     <div
@@ -111,7 +232,8 @@ const DeveloperProfile = () => {
           ← Back to Developers
         </Link>
 
-        {/* Profile Header */}
+        {/* PROFILE HEADER */}
+
         <div
           style={{
             background: "white",
@@ -158,7 +280,8 @@ const DeveloperProfile = () => {
           </p>
         </div>
 
-        {/* Statistics */}
+        {/* STATISTICS */}
+
         <div
           style={{
             display: "grid",
@@ -170,7 +293,7 @@ const DeveloperProfile = () => {
           {[
             {
               label: "Total Skills",
-              value: developer.skills.length,
+              value: skills.length,
             },
             {
               label: "Projects",
@@ -183,6 +306,10 @@ const DeveloperProfile = () => {
             {
               label: "Mutual Connections",
               value: mutualConnections.length,
+            },
+            {
+              label: "Total Endorsements",
+              value: totalEndorsements,
             },
           ].map((item) => (
             <div
@@ -203,7 +330,8 @@ const DeveloperProfile = () => {
           ))}
         </div>
 
-        {/* Mutual Connections */}
+        {/* MUTUAL CONNECTIONS */}
+
         <section
           style={{
             background: "white",
@@ -282,7 +410,8 @@ const DeveloperProfile = () => {
           )}
         </section>
 
-        {/* Skills */}
+        {/* SKILLS AND ENDORSEMENTS */}
+
         <section
           style={{
             background: "white",
@@ -291,38 +420,211 @@ const DeveloperProfile = () => {
             marginTop: "25px",
           }}
         >
-          <h2>Technical Skills</h2>
+          <h2>🏆 Technical Skills & Endorsements</h2>
 
-          {developer.skills.length === 0 ? (
+          <p style={{ color: "#64748b" }}>
+            Skills are ranked according to their endorsement count.
+          </p>
+
+          {successMessage && (
+            <p
+              style={{
+                background: "#dcfce7",
+                color: "#15803d",
+                padding: "12px",
+                borderRadius: "8px",
+              }}
+            >
+              {successMessage}
+            </p>
+          )}
+
+          {actionError && (
+            <p
+              style={{
+                background: "#fee2e2",
+                color: "#dc2626",
+                padding: "12px",
+                borderRadius: "8px",
+              }}
+            >
+              {actionError}
+            </p>
+          )}
+
+          {endorsementLoading ? (
+            <p style={{ color: "#64748b" }}>
+              Loading skills and endorsements...
+            </p>
+          ) : endorsementError ? (
+            <p style={{ color: "#dc2626" }}>{endorsementError}</p>
+          ) : skills.length === 0 ? (
             <p style={{ color: "#64748b" }}>
               No skills added yet.
             </p>
           ) : (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-              {developer.skills.map((skill) => (
-                <div
-                  key={skill.id}
-                  style={{
-                    background: "#dbeafe",
-                    color: "#1d4ed8",
-                    padding: "10px 16px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <strong>{skill.name}</strong>
+            <div style={{ display: "grid", gap: "18px", marginTop: "20px" }}>
+              {skills.map((skill, index) => {
+                const alreadyEndorsed = skill.endorsements.some(
+                  (endorsement) =>
+                    endorsement.fromUserId === user?.id
+                );
 
-                  {skill.level && (
-                    <span style={{ marginLeft: "8px", fontSize: "12px" }}>
-                      ({skill.level})
-                    </span>
-                  )}
-                </div>
-              ))}
+                const isProcessing = processingSkillId === skill.id;
+
+                return (
+                  <div
+                    key={skill.id}
+                    style={{
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "12px",
+                      padding: "20px",
+                      background: "#ffffff",
+                    }}
+                  >
+                    {/* Skill Header */}
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "10px",
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ margin: "0 0 7px", color: "#1e293b" }}>
+                          {index === 0 && skill._count.endorsements > 0
+                            ? "🏆 "
+                            : ""}
+                          {skill.name}
+                        </h3>
+
+                        {skill.level && (
+                          <span style={{ color: "#64748b", fontSize: "13px" }}>
+                            Level: {skill.level}
+                          </span>
+                        )}
+                      </div>
+
+                      <span
+                        style={{
+                          background: "#dbeafe",
+                          color: "#1d4ed8",
+                          padding: "8px 14px",
+                          borderRadius: "20px",
+                          fontWeight: "600",
+                          fontSize: "13px",
+                        }}
+                      >
+                        👍 {skill._count.endorsements} Endorsements
+                      </span>
+                    </div>
+
+                    {/* Endorse Button */}
+
+                    {!isOwnProfile && (
+                      <button
+                        onClick={() =>
+                          alreadyEndorsed
+                            ? handleRemoveEndorsement(skill.id)
+                            : handleEndorse(skill.id)
+                        }
+                        disabled={isProcessing}
+                        style={{
+                          marginTop: "15px",
+                          padding: "10px 18px",
+                          borderRadius: "8px",
+                          border: "none",
+                          background: alreadyEndorsed
+                            ? "#fee2e2"
+                            : "#2563eb",
+                          color: alreadyEndorsed ? "#dc2626" : "white",
+                          fontWeight: "600",
+                          cursor: isProcessing ? "not-allowed" : "pointer",
+                          opacity: isProcessing ? 0.6 : 1,
+                        }}
+                      >
+                        {isProcessing
+                          ? "Processing..."
+                          : alreadyEndorsed
+                          ? "✓ Endorsed (Remove)"
+                          : "👍 Endorse Skill"}
+                      </button>
+                    )}
+
+                    {/* Endorsers List */}
+
+                    {skill.endorsements.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "20px",
+                          borderTop: "1px solid #e2e8f0",
+                          paddingTop: "15px",
+                        }}
+                      >
+                        <h4 style={{ color: "#334155" }}>
+                          Endorsed by
+                        </h4>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "15px",
+                          }}
+                        >
+                          {skill.endorsements.map((endorsement) => (
+                            <div
+                              key={endorsement.id}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                background: "#f8fafc",
+                                padding: "8px 12px",
+                                borderRadius: "8px",
+                              }}
+                            >
+                              <img
+                                src={
+                                  endorsement.fromUser.avatar ||
+                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    endorsement.fromUser.name
+                                  )}&background=random`
+                                }
+                                alt={endorsement.fromUser.name}
+                                style={{
+                                  width: "35px",
+                                  height: "35px",
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                              />
+
+                              <span
+                                style={{
+                                  fontSize: "13px",
+                                  color: "#334155",
+                                }}
+                              >
+                                {endorsement.fromUser.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
 
-        {/* Projects */}
+        {/* PROJECTS */}
+
         <section
           style={{
             background: "white",

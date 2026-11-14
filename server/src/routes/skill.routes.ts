@@ -6,20 +6,43 @@ import {
   getSkills,
   updateSkill,
   deleteSkill,
+  endorseSkill,
+  removeEndorsement,
+  getUserSkillsWithEndorsements,
 } from "../controllers/skill.controller";
 
 const router = Router();
 
-// Add Skill
-router.post("/", protect, createSkill);
+// All routes require authentication
+router.use(protect);
 
-// Get All Skills
-router.get("/", protect, getSkills);
+// ==========================================
+// SKILL ROUTES
+// ==========================================
+
+// Add Skill
+router.post("/", createSkill);
+
+// Get Logged-in User Skills
+router.get("/", getSkills);
 
 // Update Skill
-router.put("/:id", protect, updateSkill);
+router.put("/:id", updateSkill);
 
 // Delete Skill
-router.delete("/:id", protect, deleteSkill);
+router.delete("/:id", deleteSkill);
+
+// ==========================================
+// ENDORSEMENT ROUTES
+// ==========================================
+
+// Endorse another user's skill
+router.post("/endorse/:skillId", endorseSkill);
+
+// Remove your endorsement
+router.delete("/endorse/:skillId", removeEndorsement);
+
+// Get user's skills with endorsement details and top skills
+router.get("/user/:userId/endorsements", getUserSkillsWithEndorsements);
 
 export default router;

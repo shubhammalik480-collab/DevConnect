@@ -93,6 +93,7 @@ model Endorsement {
   fromUser User  @relation("GivenEndorsements", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser   User  @relation("ReceivedEndorsements", fields: [toUserId], references: [id], onDelete: Cascade)
   skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+    @@unique([fromUserId, skillId])
 }
 
 model Connection {
