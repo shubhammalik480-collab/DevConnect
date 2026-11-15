@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import type { User } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 import {
   getSkills,
@@ -26,8 +25,7 @@ interface Skill {
 }
 
 const Profile = () => {
-  const { user, logout, updateUser } = useAuth();
-  const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
 
   // Profile states
   const [isEditing, setIsEditing] = useState(false);
@@ -184,7 +182,6 @@ const Profile = () => {
       setProjectTechStack("");
       setProjectLiveUrl("");
       setProjectRepositoryUrl("");
-
     } catch (error) {
       setProjectError(
         error instanceof Error
@@ -285,7 +282,6 @@ const Profile = () => {
       setImage(null);
 
       alert("Profile updated successfully!");
-
     } catch (error) {
       setError(
         error instanceof Error
@@ -297,47 +293,12 @@ const Profile = () => {
     }
   };
 
-  // Logout
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/login");
-    } catch {
-      alert("Logout failed. Please try again.");
-    }
-  };
-
   if (!user) {
     return <h2>Loading profile...</h2>;
   }
 
   return (
     <div className="profile-container">
-
-      {/* Navbar */}
-      <nav className="profile-navbar">
-        <h2>DevConnect</h2>
-
-        <div>
-          <button onClick={() => navigate("/blogs")}>
-            Blogs
-          </button>
-
-          <button onClick={() => navigate("/developers")}>
-            Developers
-          </button>
-          <button onClick={() => navigate("/connections")}>
-           Connections
-          </button>
-
-          <button
-            className="logout-btn"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <section className="profile-hero">

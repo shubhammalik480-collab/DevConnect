@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { createServer } from "http";
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
@@ -11,10 +12,17 @@ import blogRoutes from "./routes/blog.routes";
 import connectionRoutes from "./routes/connection.routes";
 
 import passport from "./config/passport";
+import { initializeSocket } from "./config/socket";
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+
+// Create HTTP Server
+const httpServer = createServer(app);
+
+// Initialize Socket.IO
+initializeSocket(httpServer);
 
 // Middleware
 app.use(
@@ -44,7 +52,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/connections", connectionRoutes);
 
-// Start Server
-app.listen(PORT, () => {
+// Start HTTP Server
+httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/database";
+import { getIO } from "../config/socket";
 
 // 1. Send Connection Request
 export const sendConnectionRequest = async (
@@ -53,12 +54,25 @@ export const sendConnectionRequest = async (
     }
 
     const connection = await prisma.connection.create({
-      data: {
-        requesterId,
-        receiverId,
-        status: "PENDING",
-      },
-    });
+  data: {
+    requesterId,
+    receiverId,
+    status: "PENDING",
+  },
+});
+
+// Real-time notification to receiver
+try {
+  getIO().to(`user_${receiverId}`).emit("notification", {
+    id: connection.id,
+    type: "CONNECTION_REQUEST",
+    message: "You received a new connection request",
+    fromUserId: requesterId,
+    createdAt: connection.createdAt,
+  });
+} catch (socketError) {
+  console.error("Connection request notification error:", socketError);
+}
 
     return res.status(201).json({
       success: true,
@@ -114,12 +128,25 @@ export const acceptConnectionRequest = async (
         success: false,
         message: "This request is no longer pending",
       });
+
     }
 
     const updatedConnection = await prisma.connection.update({
       where: { id: connectionId },
       data: { status: "ACCEPTED" },
     });
+    // Real-time notification to original requester
+try {
+  getIO().to(`user_${connection.requesterId}`).emit("notification", {
+    id: updatedConnection.id,
+    type: "CONNECTION_ACCEPTED",
+    message: "Your connection request was accepted",
+    fromUserId: userId,
+    createdAt: updatedConnection.updatedAt,
+  });
+} catch (socketError) {
+  console.error("Connection accepted notification error:", socketError);
+}
 
     return res.status(200).json({
       success: true,

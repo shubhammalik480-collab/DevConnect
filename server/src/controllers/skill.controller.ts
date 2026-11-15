@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/database";
+import { getIO } from "../config/socket";
 
 // ==========================================
 // CREATE SKILL
@@ -229,6 +230,21 @@ export const endorseSkill = async (req: Request, res: Response) => {
         },
       },
     });
+
+        // Real-time notification to skill owner
+    try {
+      getIO().to(`user_${skill.userId}`).emit("notification", {
+        id: endorsement.id,
+        type: "SKILL_ENDORSED",
+        message: `${endorsement.fromUser.name} endorsed your ${endorsement.skill.name} skill`,
+        fromUserId,
+        skillId,
+        skillName: endorsement.skill.name,
+        createdAt: endorsement.createdAt,
+      });
+    } catch (socketError) {
+      console.error("Skill endorsement notification error:", socketError);
+    }
 
     return res.status(201).json({
       success: true,
