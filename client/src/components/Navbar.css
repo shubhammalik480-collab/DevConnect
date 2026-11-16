@@ -1,3 +1,5 @@
+/* Main Navbar */
+
 .main-navbar {
   display: flex;
   justify-content: space-between;
@@ -16,7 +18,10 @@
   font-size: 25px;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
 }
+
+/* Navigation Links */
 
 .navbar-links {
   display: flex;
@@ -29,19 +34,38 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
+  transition: color 0.2s ease;
 }
 
 .navbar-links > a:hover {
   color: #2563eb;
 }
 
+/* Hamburger Button */
+
+.hamburger-btn {
+  display: none;
+  background: #eff6ff;
+  border: none;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #2563eb;
+}
+
+/* Logout Button */
+
 .navbar-logout {
-  padding: 10px 22px;
+  padding: 11px 22px;
+  min-height: 44px;
   background: #ef4444;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .navbar-logout:hover {
@@ -59,8 +83,8 @@
   background: #eff6ff;
   border: none;
   border-radius: 50%;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   font-size: 20px;
   cursor: pointer;
 }
@@ -80,13 +104,14 @@
   justify-content: center;
 }
 
-/* Dropdown */
+/* Notification Dropdown */
 
 .notification-dropdown {
   position: absolute;
   top: 52px;
   right: 0;
   width: 330px;
+  max-width: calc(100vw - 30px);
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -113,6 +138,7 @@
   color: #2563eb;
   cursor: pointer;
   font-size: 12px;
+  min-height: 36px;
 }
 
 .notification-list {
@@ -133,6 +159,7 @@
   font-size: 13px;
   color: #334155;
   margin-bottom: 7px;
+  overflow-wrap: anywhere;
 }
 
 .notification-item small {
@@ -147,22 +174,116 @@
   font-size: 13px;
 }
 
-/* Responsive */
+/* Tablet Layout */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .main-navbar {
-    flex-direction: column;
-    gap: 18px;
+    padding: 15px 18px;
   }
 
   .navbar-links {
-    flex-wrap: wrap;
-    justify-content: center;
     gap: 12px;
   }
 
+  .navbar-links > a {
+    font-size: 13px;
+  }
+
+  .navbar-logout {
+    padding: 10px 15px;
+  }
+}
+
+/* Mobile Navigation */
+
+@media (max-width: 768px) {
+  .main-navbar {
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .navbar-brand {
+    font-size: 23px;
+  }
+
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+  }
+
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 5px;
+    padding: 12px 0 5px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  .navbar-links > a {
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .navbar-links > a:hover {
+    background: #eff6ff;
+  }
+
+  .notification-wrapper {
+    width: 100%;
+  }
+
+  .notification-btn {
+    border-radius: 8px;
+  }
+
   .notification-dropdown {
-    right: -80px;
-    width: 290px;
+    top: 50px;
+    left: 0;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .navbar-logout {
+    width: 100%;
+    margin-top: 5px;
+  }
+}
+
+/* Small Mobile Screens */
+
+@media (max-width: 480px) {
+  .main-navbar {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .navbar-brand {
+    font-size: 21px;
+  }
+
+  .notification-dropdown {
+    width: 100%;
+  }
+}
+
+/* Touch Device Interactions */
+
+@media (hover: none) {
+  .navbar-links > a:active,
+  .navbar-logout:active,
+  .notification-btn:active,
+  .hamburger-btn:active {
+    opacity: 0.75;
   }
 }

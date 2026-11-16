@@ -8,12 +8,12 @@ import "./Navbar.css";
 
 const Navbar = () => {
   const { logout } = useAuth();
-
   const { notifications, clearNotifications } = useSocket();
 
   const navigate = useNavigate();
 
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -22,6 +22,11 @@ const Navbar = () => {
     } catch {
       alert("Logout failed. Please try again.");
     }
+  };
+
+  const closeMenu = () => {
+    setShowMenu(false);
+    setShowNotifications(false);
   };
 
   const handleNotificationClick = () => {
@@ -34,15 +39,30 @@ const Navbar = () => {
 
   return (
     <nav className="main-navbar">
-      <Link to="/" className="navbar-brand">
+      <Link to="/" className="navbar-brand" onClick={closeMenu}>
         DevConnect
       </Link>
 
-      <div className="navbar-links">
-        <Link to="/">Profile</Link>
-        <Link to="/blogs">Blogs</Link>
-        <Link to="/developers">Developers</Link>
-        <Link to="/connections">Connections</Link>
+      {/* Mobile Hamburger Button */}
+      <button
+        className="hamburger-btn"
+        onClick={() => setShowMenu((previous) => !previous)}
+        aria-label={showMenu ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={showMenu}
+        aria-controls="navbar-links"
+      >
+        {showMenu ? "✕" : "☰"}
+      </button>
+
+      {/* Navigation Links */}
+      <div
+        id="navbar-links"
+        className={`navbar-links ${showMenu ? "active" : ""}`}
+      >
+        <Link to="/" onClick={closeMenu}>Profile</Link>
+        <Link to="/blogs" onClick={closeMenu}>Blogs</Link>
+        <Link to="/developers" onClick={closeMenu}>Developers</Link>
+        <Link to="/connections" onClick={closeMenu}>Connections</Link>
 
         {/* Notification Bell */}
         <div className="notification-wrapper">
@@ -50,6 +70,7 @@ const Navbar = () => {
             className="notification-btn"
             onClick={handleNotificationClick}
             aria-label="Notifications"
+            aria-expanded={showNotifications}
           >
             🔔
 
@@ -100,10 +121,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <button
-          className="navbar-logout"
-          onClick={handleLogout}
-        >
+        <button className="navbar-logout" onClick={handleLogout}>
           Logout
         </button>
       </div>

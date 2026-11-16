@@ -363,3 +363,192 @@
     grid-template-columns: 1fr;
   }
 }
+/* =================================
+   TABLET RESPONSIVENESS
+================================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .profile-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .profile-hero {
+    gap: 25px;
+    padding: 30px;
+  }
+
+  .profile-avatar img,
+  .avatar-placeholder {
+    width: 130px;
+    height: 130px;
+  }
+
+  .profile-info h1 {
+    font-size: 30px;
+  }
+
+  .profile-section {
+    padding: 25px;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =================================
+   MOBILE FORM IMPROVEMENTS
+================================= */
+
+@media (max-width: 768px) {
+  .profile-container {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .profile-hero {
+    gap: 20px;
+    padding: 25px 15px;
+  }
+
+  .profile-info {
+    width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .profile-info h1 {
+    font-size: 25px;
+    overflow-wrap: anywhere;
+  }
+
+  .profile-section {
+    width: 100%;
+    padding: 18px 15px;
+    margin-top: 20px;
+  }
+
+  .profile-section form > div {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .profile-section form label {
+    display: block;
+    margin-bottom: 7px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .profile-section input,
+  .profile-section textarea,
+  .profile-section select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .profile-section form button,
+  .profile-info button {
+    min-height: 44px;
+    width: 100%;
+  }
+
+  .project-card,
+  .skill-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .project-links a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* =================================
+   SMALL MOBILE IMPROVEMENTS
+================================= */
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 10px;
+  }
+
+  .profile-hero {
+    padding: 22px 12px;
+  }
+
+  .profile-section {
+    padding: 16px 12px;
+  }
+
+  .profile-section h2 {
+    font-size: 20px;
+  }
+
+  .project-card {
+    padding: 18px;
+  }
+
+  .project-card h3 {
+    font-size: 18px;
+  }
+
+  .project-tags {
+    gap: 6px;
+  }
+}
+/* Mobile Form Height Optimization */
+
+@media (max-width: 768px) {
+  .profile-section input,
+  .profile-section select {
+    min-height: 46px;
+    height: 46px;
+    padding: 10px 12px;
+  }
+
+  .profile-section textarea {
+    min-height: 110px;
+    padding: 12px;
+  }
+
+  .profile-section input[type="file"] {
+    height: auto;
+    min-height: 46px;
+  }
+
+  .profile-section form {
+    gap: 12px;
+  }
+
+  .profile-section form button {
+    height: 46px;
+  }
+}
+@media (max-width: 768px) {
+  .profile-section form input,
+  .profile-section form select {
+    flex: 0 0 46px;
+    height: 46px;
+    min-height: 46px;
+    width: 100%;
+  }
+
+  .profile-section form textarea {
+    flex: 0 0 110px;
+    height: 110px;
+    min-height: 110px;
+    width: 100%;
+  }
+
+  .profile-section form input[type="file"] {
+    flex: 0 0 auto;
+    height: auto;
+  }
+}

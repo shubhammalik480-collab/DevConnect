@@ -1,0 +1,405 @@
+/* Developers Page */
+.developers-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 40px 20px;
+}
+
+.developers-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.developers-header {
+  margin-bottom: 35px;
+}
+
+.developers-header h1 {
+  font-size: 36px;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.developers-header p {
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Search */
+.developers-search {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 35px;
+}
+
+.developers-search input {
+  display: block;
+  width: 100%;
+  height: 54px;
+  box-sizing: border-box;
+  padding: 14px 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+  background: #fff;
+  color: #1e293b;
+}
+
+.developers-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.developers-search input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+/* Results */
+.developers-results {
+  margin-bottom: 20px;
+}
+
+.developers-results h2 {
+  color: #1e293b;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.developers-results p {
+  color: #64748b;
+}
+
+/* Developer Grid */
+.developers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Developer Card */
+.developer-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+}
+
+.developer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Developer Info */
+.developer-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.developer-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 14px;
+  border: 3px solid #dbeafe;
+}
+
+.developer-info h3 {
+  color: #1e293b;
+  font-size: 20px;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+
+.developer-location {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.developer-bio {
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Skills */
+.developer-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.developer-skill {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 6px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Stats */
+.developer-stats {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+/* Actions */
+.developer-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.developer-actions a,
+.developer-actions button {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.view-profile-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.view-profile-btn:hover {
+  background: #dbeafe;
+}
+
+.connect-btn {
+  background: #2563eb;
+  color: white;
+  border: 1px solid #2563eb;
+}
+
+.connect-btn:hover {
+  background: #1d4ed8;
+}
+
+.connect-btn:disabled {
+  background: #94a3b8;
+  border-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Empty, Loading and Error States */
+.developers-message {
+  text-align: center;
+  padding: 35px 15px;
+  color: #64748b;
+  background: #fff;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .developers-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .developers-container {
+    padding: 30px 18px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .developers-container {
+    padding: 25px 15px;
+  }
+
+  .developers-header {
+    margin-bottom: 25px;
+  }
+
+  .developers-header h1 {
+    font-size: 28px;
+  }
+
+  .developers-header p {
+    font-size: 14px;
+  }
+
+  .developers-search {
+  max-width: 100%;
+  margin-bottom: 25px;
+}
+
+.developers-search input {
+  width: 100%;
+  font-size: 15px;
+}
+  .developers-results h2 {
+    font-size: 21px;
+  }
+
+  .developers-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .developer-card {
+    padding: 20px;
+  }
+
+  .developer-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .developer-actions {
+    gap: 8px;
+  }
+
+  .developer-actions a,
+  .developer-actions button {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 10px 8px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 380px) {
+  .developers-container {
+    padding: 20px 12px;
+  }
+
+  .developers-header h1 {
+    font-size: 25px;
+  }
+
+  .developer-card {
+    padding: 16px;
+  }
+
+  .developer-actions {
+    flex-direction: column;
+  }
+
+  .developer-actions a,
+  .developer-actions button {
+    width: 100%;
+  }
+}
+.developers-search {
+  display: block;
+  min-width: 0;
+  height: 54px;
+  line-height: normal;
+}
+
+.developers-search::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+@media (max-width: 380px) {
+  .developers-search {
+    width: 100%;
+    font-size: 15px;
+  }
+}
+.developer-section {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  margin-top: 25px;
+}
+
+.developer-section-title {
+  color: #1e293b;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.developer-section-description {
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.mutual-connections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.mutual-connection-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  min-width: 0;
+}
+
+.mutual-connection-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mutual-connection-info {
+  min-width: 0;
+}
+
+.mutual-connection-info h4 {
+  margin: 0 0 5px;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+
+.mutual-connection-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  overflow-wrap: anywhere;
+}
+
+.section-loading,
+.section-empty {
+  color: #64748b;
+}
+
+.section-error {
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .developer-section {
+    padding: 18px;
+  }
+
+  .mutual-connections-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

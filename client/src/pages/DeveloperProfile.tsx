@@ -245,170 +245,112 @@ const DeveloperProfile = () => {
           }}
         >
           <img
+  src={
+    developer.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      developer.name
+    )}&background=random`
+  }
+  alt={developer.name}
+  className="developer-profile-avatar"
+/>
+
+<h1 className="developer-profile-name">
+  {developer.name}
+</h1>
+
+<p className="developer-profile-location">
+  {developer.location || "Location not added"}
+</p>
+
+<p className="developer-profile-bio">
+  {developer.bio || "No bio available"}
+</p>
+
+         
+        </div>
+
+       {/* STATISTICS */}
+
+<div className="developer-stats-grid">
+  {[
+    {
+      label: "Total Skills",
+      value: skills.length,
+    },
+    {
+      label: "Projects",
+      value: developer._count.projects,
+    },
+    {
+      label: "Blog Posts",
+      value: developer._count.blogPosts,
+    },
+    {
+      label: "Mutual Connections",
+      value: mutualConnections.length,
+    },
+    {
+      label: "Total Endorsements",
+      value: totalEndorsements,
+    },
+  ].map((item) => (
+    <div key={item.label} className="developer-stat-card">
+      <h2>{item.value}</h2>
+      <p>{item.label}</p>
+    </div>
+  ))}
+</div>
+
+   {/* MUTUAL CONNECTIONS */}
+
+<section className="developer-section">
+  <h2 className="developer-section-title">
+    Mutual Connections
+  </h2>
+
+  <p className="developer-section-description">
+    People you both are connected with.
+  </p>
+
+  {mutualLoading ? (
+    <p className="section-loading">Loading mutual connections...</p>
+  ) : mutualError ? (
+    <p className="section-error">{mutualError}</p>
+  ) : mutualConnections.length === 0 ? (
+    <p className="section-empty">
+      No mutual connections yet.
+    </p>
+  ) : (
+    <div className="mutual-connections-grid">
+      {mutualConnections.map((person) => (
+        <div
+          key={person.id}
+          className="mutual-connection-card"
+        >
+          <img
             src={
-              developer.avatar ||
+              person.avatar ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                developer.name
+                person.name
               )}&background=random`
             }
-            alt={developer.name}
-            style={{
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
+            alt={person.name}
+            className="mutual-connection-avatar"
           />
 
-          <h1 style={{ color: "#1e293b", marginBottom: "8px" }}>
-            {developer.name}
-          </h1>
+          <div className="mutual-connection-info">
+            <h4>{person.name}</h4>
 
-          <p style={{ color: "#64748b" }}>
-            📍 {developer.location || "Location not added"}
-          </p>
-
-          <p
-            style={{
-              color: "#475569",
-              maxWidth: "600px",
-              margin: "20px auto",
-              lineHeight: "1.7",
-            }}
-          >
-            {developer.bio || "No bio available"}
-          </p>
-        </div>
-
-        {/* STATISTICS */}
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "20px",
-            marginTop: "25px",
-          }}
-        >
-          {[
-            {
-              label: "Total Skills",
-              value: skills.length,
-            },
-            {
-              label: "Projects",
-              value: developer._count.projects,
-            },
-            {
-              label: "Blog Posts",
-              value: developer._count.blogPosts,
-            },
-            {
-              label: "Mutual Connections",
-              value: mutualConnections.length,
-            },
-            {
-              label: "Total Endorsements",
-              value: totalEndorsements,
-            },
-          ].map((item) => (
-            <div
-              key={item.label}
-              style={{
-                background: "white",
-                padding: "25px",
-                borderRadius: "12px",
-                textAlign: "center",
-              }}
-            >
-              <h2 style={{ color: "#2563eb", fontSize: "30px" }}>
-                {item.value}
-              </h2>
-
-              <p style={{ color: "#64748b" }}>{item.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* MUTUAL CONNECTIONS */}
-
-        <section
-          style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "14px",
-            marginTop: "25px",
-          }}
-        >
-          <h2>🤝 Mutual Connections</h2>
-
-          {mutualLoading ? (
-            <p style={{ color: "#64748b" }}>
-              Loading mutual connections...
+            <p>
+              {person.location || "Location not added"}
             </p>
-          ) : mutualError ? (
-            <p style={{ color: "#dc2626" }}>{mutualError}</p>
-          ) : mutualConnections.length === 0 ? (
-            <p style={{ color: "#64748b" }}>
-              No mutual connections yet.
-            </p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-                gap: "15px",
-                marginTop: "20px",
-              }}
-            >
-              {mutualConnections.map((person) => (
-                <div
-                  key={person.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    padding: "15px",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <img
-                    src={
-                      person.avatar ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        person.name
-                      )}&background=random`
-                    }
-                    alt={person.name}
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-
-                  <div>
-                    <h4 style={{ margin: "0 0 5px", color: "#1e293b" }}>
-                      {person.name}
-                    </h4>
-
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "12px",
-                        color: "#64748b",
-                      }}
-                    >
-                      {person.location || "Location not added"}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</section>     
 
         {/* SKILLS AND ENDORSEMENTS */}
 
