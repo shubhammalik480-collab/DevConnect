@@ -10,7 +10,8 @@ import projectRoutes from "./routes/project.routes";
 import skillRoutes from "./routes/skill.routes";
 import blogRoutes from "./routes/blog.routes";
 import connectionRoutes from "./routes/connection.routes";
-
+import activityRoutes from "./routes/activity.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 import passport from "./config/passport";
 import { initializeSocket } from "./config/socket";
 
@@ -51,7 +52,8 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/connections", connectionRoutes);
-
+app.use("/api/activities", activityRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 // Start HTTP Server
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

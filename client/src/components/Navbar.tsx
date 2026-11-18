@@ -59,6 +59,7 @@ const Navbar = () => {
         id="navbar-links"
         className={`navbar-links ${showMenu ? "active" : ""}`}
       >
+        <Link to="/dashboard" onClick={closeMenu}>Dashboard</Link>
         <Link to="/" onClick={closeMenu}>Profile</Link>
         <Link to="/blogs" onClick={closeMenu}>Blogs</Link>
         <Link to="/developers" onClick={closeMenu}>Developers</Link>

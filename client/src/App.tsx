@@ -13,6 +13,7 @@ import Developers from "./pages/Developers";
 import DeveloperProfile from "./pages/DeveloperProfile";
 import Connections from "./pages/Connection";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -20,9 +21,11 @@ function App() {
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
+      <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<Profile />} />
 
         {/* Blog Routes */}

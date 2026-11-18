@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./DeveloperProfile.css";
+
 import {
   getDevelopers,
   sendConnectionRequest,

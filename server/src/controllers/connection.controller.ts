@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/database";
 import { getIO } from "../config/socket";
+import { createActivity } from "./activity.controller";
 
 // 1. Send Connection Request
 export const sendConnectionRequest = async (
@@ -59,6 +60,16 @@ export const sendConnectionRequest = async (
     receiverId,
     status: "PENDING",
   },
+});
+// Save activity for receiver
+await createActivity(
+  receiverId,
+  requesterId,
+  "CONNECTION_REQUEST",
+  "sent you a connection request",
+  connection.id
+).catch((error) => {
+  console.error("Activity creation failed:", error);
 });
 
 // Real-time notification to receiver
@@ -135,6 +146,16 @@ export const acceptConnectionRequest = async (
       where: { id: connectionId },
       data: { status: "ACCEPTED" },
     });
+    // Save activity for original requester
+await createActivity(
+  connection.requesterId,
+  userId,
+  "CONNECTION_ACCEPTED",
+  "accepted your connection request",
+  updatedConnection.id
+).catch((error) => {
+  console.error("Activity creation failed:", error);
+});
     // Real-time notification to original requester
 try {
   getIO().to(`user_${connection.requesterId}`).emit("notification", {

@@ -38,6 +38,8 @@ model User {
   endorsementsReceived Endorsement[] @relation("ReceivedEndorsements")
   sentConnections      Connection[]  @relation("ConnectionRequester")
   receivedConnections Connection[]  @relation("ConnectionReceiver")
+  activities         Activity[] @relation("UserActivities")
+  performedActivities Activity[] @relation("ActivityActor")
 }
 
 model Project {
@@ -108,4 +110,18 @@ model Connection {
   receiver  User @relation("ConnectionReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@unique([requesterId, receiverId])
+}
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  actorId     String
+  type        String
+  message     String
+  entityId    String?
+  createdAt   DateTime @default(now())
+
+  user User @relation("UserActivities", fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

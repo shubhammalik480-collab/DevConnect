@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/database";
 import { getIO } from "../config/socket";
-
+import { createActivity } from "./activity.controller";
 // ==========================================
 // CREATE SKILL
 // ==========================================
@@ -230,6 +230,16 @@ export const endorseSkill = async (req: Request, res: Response) => {
         },
       },
     });
+    // Save activity for skill owner
+await createActivity(
+  skill.userId,
+  fromUserId,
+  "SKILL_ENDORSED",
+  `endorsed your ${skill.name} skill`,
+  endorsement.id
+).catch((error) => {
+  console.error("Activity creation failed:", error);
+});
 
         // Real-time notification to skill owner
     try {
