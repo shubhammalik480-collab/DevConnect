@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { getBlogs } from "../services/blog.service";
 import type { Blog } from "../services/blog.service";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 import "./Blogs.css";
 

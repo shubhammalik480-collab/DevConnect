@@ -1,43 +1,72 @@
 import jwt from "jsonwebtoken";
-import { loginUser } from "../services/auth.service";
 import { Request, Response } from "express";
-import { registerUser } from "../services/auth.service";
+import { loginUser, registerUser } from "../services/auth.service";
+
+const getJWTSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+
+  return secret;
+};
+
+const setAuthCookie = (res: Response, userId: string) => {
+  const token = jwt.sign(
+    { userId },
+    getJWTSecret(),
+    {
+      expiresIn: "7d",
+      algorithm: "HS256",
+    }
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+};
 
 // Register Controller
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validate input
-    if (!name || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !name.trim() ||
+      !email.trim() ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Name, email and password are required",
+        message: "Valid name, email and password are required.",
       });
     }
 
-    // Create user
-    const user = await registerUser(name, email, password);
-    // Generate JWT token after registration
-const secret = process.env.JWT_SECRET;
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+      password.length < 8 ||
+      name.trim().length > 100
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide valid registration details. Password must be at least 8 characters.",
+      });
+    }
 
-if (!secret) {
-  throw new Error("JWT_SECRET is not configured");
-}
+    const user = await registerUser(
+      name.trim(),
+      email.trim().toLowerCase(),
+      password
+    );
 
-const token = jwt.sign(
-  { userId: user.id },
-  secret,
-  { expiresIn: "7d" }
-);
-
-// Store token in HTTP-only cookie
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+    setAuthCookie(res, user.id);
 
     return res.status(201).json({
       success: true,
@@ -45,12 +74,21 @@ res.cookie("token", token, {
       data: user,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Registration failed";
+    console.error("Registration error:", error);
 
-    return res.status(400).json({
+    if (
+      error instanceof Error &&
+      error.message === "User already exists with this email"
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Registration failed. Please try again.",
     });
   }
 };
@@ -60,94 +98,70 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !email.trim() ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Email and password are required.",
       });
     }
 
-    // Verify user credentials
-    const user = await loginUser(email, password);
-
-    // Get JWT secret
-    const secret = process.env.JWT_SECRET;
-
-    if (!secret) {
-      throw new Error("JWT_SECRET is not configured");
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.id },
-      secret,
-      { expiresIn: "7d" }
+    const user = await loginUser(
+      email.trim().toLowerCase(),
+      password
     );
 
-    // Store token in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    setAuthCookie(res, user.id);
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
       data: user,
     });
-
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Login failed";
+    console.error("Login error:", error);
 
-    return res.status(401).json({
+    if (
+      error instanceof Error &&
+      error.message === "Invalid email or password"
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Login failed. Please try again.",
     });
   }
 };
-// GitHub OAuth Callback Controller
+
+// GitHub OAuth Callback
 export const githubCallback = (req: Request, res: Response) => {
+  const frontendURL =
+    process.env.FRONTEND_URL || "http://localhost:5173";
+
   try {
-    const user = req.user as {
-      id: string;
-      name: string;
-      email: string;
-    };
+    const user = req.user as
+      | { id: string; name: string; email: string }
+      | undefined;
 
-    if (!user) {
-      return res.redirect("http://localhost:5173/login");
+    if (!user?.id) {
+      return res.redirect(`${frontendURL}/login`);
     }
 
-    const secret = process.env.JWT_SECRET;
+    setAuthCookie(res, user.id);
 
-    if (!secret) {
-      throw new Error("JWT_SECRET is not configured");
-    }
-
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user.id },
-      secret,
-      { expiresIn: "7d" }
-    );
-
-    // Store JWT in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return res.redirect("http://localhost:5173/");
-
+    return res.redirect(`${frontendURL}/`);
   } catch (error) {
     console.error("GitHub OAuth error:", error);
-    return res.redirect("http://localhost:5173/login");
+    return res.redirect(`${frontendURL}/login`);
   }
 };
 

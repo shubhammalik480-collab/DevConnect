@@ -1,18 +1,21 @@
+
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import jwt from "jsonwebtoken";
 
 let io: Server;
 
+// Initialize Socket.IO
 export const initializeSocket = (httpServer: HttpServer) => {
   io = new Server(httpServer, {
     cors: {
       origin: "http://localhost:5173",
       credentials: true,
+      methods: ["GET", "POST"],
     },
   });
 
-  // Socket Authentication
+  // Socket Authentication Middleware
   io.use((socket, next) => {
     try {
       // Read cookies from handshake headers
@@ -27,27 +30,38 @@ export const initializeSocket = (httpServer: HttpServer) => {
         ? decodeURIComponent(tokenCookie.substring(6))
         : null;
 
+      // Check token existence
       if (!token) {
         return next(new Error("Authentication required"));
       }
 
+      // Validate JWT secret
       const secret = process.env.JWT_SECRET;
 
-      if (!secret) {
-        return next(new Error("JWT_SECRET is not configured"));
+      if (!secret || secret.length < 32) {
+        console.error("JWT_SECRET is missing or too weak");
+        return next(new Error("Authentication configuration error"));
       }
 
-      const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
+      // Verify JWT token
+      const decoded = jwt.verify(token, secret, {
+        algorithms: ["HS256"],
+      });
 
-      if (!decoded.userId) {
+      // Validate JWT payload
+      if (
+        typeof decoded === "string" ||
+        typeof decoded.userId !== "string" ||
+        !decoded.userId.trim()
+      ) {
         return next(new Error("Invalid authentication token"));
       }
 
+      // Store authenticated user ID
       socket.data.userId = decoded.userId;
 
       next();
-    } catch (error) {
-      console.error("Socket Authentication Error:", error);
+    } catch {
       next(new Error("Invalid or expired token"));
     }
   });
@@ -56,13 +70,13 @@ export const initializeSocket = (httpServer: HttpServer) => {
   io.on("connection", (socket) => {
     const userId = socket.data.userId as string;
 
-    // Join personal notification room
+    // Join authenticated user's personal notification room
     socket.join(`user_${userId}`);
 
     console.log(`User connected: ${userId}`);
 
-    socket.on("disconnect", () => {
-      console.log(`User disconnected: ${userId}`);
+    socket.on("disconnect", (reason) => {
+      console.log(`User disconnected: ${userId}`, reason);
     });
   });
 

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import type { FormEvent } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
 
 import {
   getBlogBySlug,
@@ -11,6 +12,9 @@ import type { Blog } from "../services/blog.service";
 
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+
+// Lazy load Markdown Editor
+const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 
 const EditBlog = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -55,12 +59,12 @@ const EditBlog = () => {
       }
     };
 
-    fetchBlog();
+    void fetchBlog();
   }, [slug]);
 
   // Update blog
   const handleUpdate = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
@@ -103,6 +107,7 @@ const EditBlog = () => {
     return (
       <div>
         <h2>{error}</h2>
+
         <button onClick={() => navigate("/blogs")}>
           Back to Blogs
         </button>
@@ -175,12 +180,14 @@ const EditBlog = () => {
         <div data-color-mode="light">
           <label>Blog Content</label>
 
-          <MDEditor
-            value={content}
-            onChange={setContent}
-            height={400}
-            preview="live"
-          />
+          <Suspense fallback={<p>Loading Markdown Editor...</p>}>
+            <MDEditor
+              value={content}
+              onChange={setContent}
+              height={400}
+              preview="live"
+            />
+          </Suspense>
         </div>
 
         <div style={{ margin: "20px 0" }}>

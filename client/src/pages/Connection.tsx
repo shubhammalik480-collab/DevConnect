@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   getPendingRequests,
@@ -27,7 +27,7 @@ const Connections = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const loadConnections = async () => {
+  const loadConnections = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -50,11 +50,15 @@ const Connections = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadConnections();
-  }, []);
+    const timer = window.setTimeout(() => {
+      void loadConnections();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [loadConnections]);
 
   const handleAccept = async (id: string) => {
     try {
@@ -132,17 +136,13 @@ const Connections = () => {
   return (
     <main className="connections-page">
       <div className="connections-container">
-
-        {/* Header */}
         <header className="connections-header">
           <h1>My Connections</h1>
-
           <p>
             Manage your developer network and connection requests.
           </p>
         </header>
 
-        {/* Statistics */}
         <section className="connections-stats">
           {[
             {
@@ -165,7 +165,6 @@ const Connections = () => {
           ))}
         </section>
 
-        {/* Tabs */}
         <div className="connections-tabs">
           {[
             { id: "received", label: "Received Requests" },
@@ -186,10 +185,9 @@ const Connections = () => {
           ))}
         </div>
 
-        {/* Refresh */}
         <div className="connections-refresh">
           <button
-            onClick={loadConnections}
+            onClick={() => void loadConnections()}
             disabled={loading}
             className="refresh-btn"
           >
@@ -197,29 +195,20 @@ const Connections = () => {
           </button>
         </div>
 
-        {/* Success Message */}
         {message && (
-          <p className="connection-success">
-            {message}
-          </p>
+          <p className="connection-success">{message}</p>
         )}
 
-        {/* Error Message */}
         {error && (
-          <p className="connection-error">
-            {error}
-          </p>
+          <p className="connection-error">{error}</p>
         )}
 
-        {/* Loading */}
         {loading ? (
           <h3 className="connections-message">
             Loading connections...
           </h3>
         ) : (
           <section className="connections-list">
-
-            {/* Received Requests */}
             {activeTab === "received" && (
               <>
                 {receivedRequests.length === 0 ? (
@@ -259,7 +248,6 @@ const Connections = () => {
               </>
             )}
 
-            {/* Sent Requests */}
             {activeTab === "sent" && (
               <>
                 {sentRequests.length === 0 ? (
@@ -283,7 +271,6 @@ const Connections = () => {
               </>
             )}
 
-            {/* Accepted Connections */}
             {activeTab === "connections" && (
               <>
                 {connections.length === 0 ? (
@@ -306,7 +293,6 @@ const Connections = () => {
                 )}
               </>
             )}
-
           </section>
         )}
       </div>

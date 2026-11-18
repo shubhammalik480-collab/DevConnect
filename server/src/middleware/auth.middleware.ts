@@ -1,43 +1,53 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-// Authentication Middleware
 export const protect = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    // Get token from cookie
-    const token = req.cookies.token;
+  const token = req.cookies?.token;
 
-    if (!token) {
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required. Please login.",
+    });
+  }
+
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    console.error("JWT_SECRET is not configured.");
+    return res.status(500).json({
+      success: false,
+      message: "Internal server configuration error.",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secret, {
+      algorithms: ["HS256"],
+    });
+
+    if (
+      typeof decoded !== "object" ||
+      decoded === null ||
+      typeof decoded.userId !== "string" ||
+      !decoded.userId.trim()
+    ) {
       return res.status(401).json({
         success: false,
-        message: "Authentication required. Please login.",
+        message: "Invalid authentication token.",
       });
     }
 
-    // Get JWT secret
-    const secret = process.env.JWT_SECRET;
-
-    if (!secret) {
-      throw new Error("JWT_SECRET is not configured");
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, secret);
-
-    // Store user information
-    res.locals.userId = (decoded as jwt.JwtPayload).userId;
-
-    // Allow request to continue
+    res.locals.userId = decoded.userId;
     next();
-
-  } catch (error) {
+  } catch {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token",
+      message: "Invalid or expired token.",
     });
   }
 };

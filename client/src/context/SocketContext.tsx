@@ -1,55 +1,47 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { io, Socket } from "socket.io-client";
-import { useAuth } from "./AuthContext";
+import { io } from "socket.io-client";
 
-export interface Notification {
-  id: string;
-  type:
-    | "CONNECTION_REQUEST"
-    | "CONNECTION_ACCEPTED"
-    | "SKILL_ENDORSED";
-  message: string;
-  fromUserId: string;
-  createdAt: string;
-  skillId?: string;
-  skillName?: string;
-}
+import { useAuth } from "./useAuth";
+import { SocketContext } from "./socket-context";
 
-interface SocketContextType {
-  socket: Socket | null;
-  notifications: Notification[];
-  clearNotifications: () => void;
-}
-
-const SocketContext = createContext<
-  SocketContextType | undefined
->(undefined);
+import type {
+  Notification,
+  SocketContextType,
+} from "./socket.types";
 
 interface SocketProviderProps {
   children: ReactNode;
+}
+
+interface NotificationsState {
+  userId: string;
+  items: Notification[];
 }
 
 export const SocketProvider = ({
   children,
 }: SocketProviderProps) => {
   const { user } = useAuth();
+  const userId = user?.id;
 
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [notifications, setNotifications] = useState<
-    Notification[]
-  >([]);
+  const [socket, setSocket] = useState<SocketContextType["socket"]>(
+    null
+  );
+
+  const [notificationsState, setNotificationsState] =
+    useState<NotificationsState>({
+      userId: "",
+      items: [],
+    });
+
+  const notifications =
+    notificationsState.userId === userId
+      ? notificationsState.items
+      : [];
 
   useEffect(() => {
-    if (!user) {
-      setSocket(null);
-      setNotifications([]);
+    if (!userId) {
       return;
     }
 
@@ -57,19 +49,27 @@ export const SocketProvider = ({
       withCredentials: true,
     });
 
-    setSocket(newSocket);
-
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);
+      setSocket(newSocket);
     });
 
     newSocket.on("notification", (notification: Notification) => {
       console.log("New notification:", notification);
 
-      setNotifications((previous) => [
-        notification,
-        ...previous,
-      ]);
+      setNotificationsState((previous) => ({
+        userId,
+        items:
+          previous.userId === userId
+            ? [notification, ...previous.items]
+            : [notification],
+      }));
+    });
+
+    newSocket.on("disconnect", () => {
+      setSocket((currentSocket) =>
+        currentSocket === newSocket ? null : currentSocket
+      );
     });
 
     newSocket.on("connect_error", (error) => {
@@ -78,12 +78,16 @@ export const SocketProvider = ({
 
     return () => {
       newSocket.disconnect();
-      setSocket(null);
     };
-  }, [user?.id]);
+  }, [userId]);
 
   const clearNotifications = () => {
-    setNotifications([]);
+    if (!userId) return;
+
+    setNotificationsState({
+      userId,
+      items: [],
+    });
   };
 
   return (
@@ -97,16 +101,4 @@ export const SocketProvider = ({
       {children}
     </SocketContext.Provider>
   );
-};
-
-export const useSocket = () => {
-  const context = useContext(SocketContext);
-
-  if (!context) {
-    throw new Error(
-      "useSocket must be used within SocketProvider"
-    );
-  }
-
-  return context;
 };

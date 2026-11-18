@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
+
 import { createBlog } from "../services/blog.service";
 
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+
+// Lazy load Markdown Editor
+const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 
 const CreateBlog = () => {
   const navigate = useNavigate();
@@ -19,7 +23,7 @@ const CreateBlog = () => {
   const [error, setError] = useState("");
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
@@ -117,12 +121,14 @@ const CreateBlog = () => {
           <label>Blog Content (Markdown)</label>
 
           <div style={{ marginTop: "10px" }}>
-            <MDEditor
-              value={content}
-              onChange={setContent}
-              height={400}
-              preview="live"
-            />
+            <Suspense fallback={<p>Loading Markdown Editor...</p>}>
+              <MDEditor
+                value={content}
+                onChange={setContent}
+                height={400}
+                preview="live"
+              />
+            </Suspense>
           </div>
         </div>
 
@@ -153,7 +159,11 @@ const CreateBlog = () => {
             cursor: "pointer",
           }}
         >
-          {loading ? "Saving..." : published ? "Publish Blog" : "Save Draft"}
+          {loading
+            ? "Saving..."
+            : published
+              ? "Publish Blog"
+              : "Save Draft"}
         </button>
 
         <button

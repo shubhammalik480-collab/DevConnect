@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import type { User } from "../context/AuthContext";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+import type { FormEvent } from "react";
+
+import { useAuth } from "../context/useAuth";
+import type { User } from "../context/auth.types";
 
 import {
   getSkills,
@@ -63,9 +70,10 @@ const Profile = () => {
   const [projectError, setProjectError] = useState("");
 
   // Fetch Skills
-  const fetchSkills = async () => {
+  const fetchSkills = useCallback(async () => {
     try {
       setSkillsLoading(true);
+      setSkillError("");
 
       const data = await getSkills();
       setSkills(data);
@@ -78,12 +86,13 @@ const Profile = () => {
     } finally {
       setSkillsLoading(false);
     }
-  };
+  }, []);
 
   // Fetch Projects
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setProjectsLoading(true);
+      setProjectError("");
 
       const data = await getProjects();
       setProjects(data);
@@ -96,17 +105,21 @@ const Profile = () => {
     } finally {
       setProjectsLoading(false);
     }
-  };
+  }, []);
 
   // Load Skills and Projects
   useEffect(() => {
-    fetchSkills();
-    fetchProjects();
-  }, []);
+    const timer = window.setTimeout(() => {
+      void fetchSkills();
+      void fetchProjects();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [fetchSkills, fetchProjects]);
 
   // Add Skill
   const handleAddSkill = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
@@ -144,7 +157,7 @@ const Profile = () => {
 
   // Add Project
   const handleAddProject = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
@@ -181,7 +194,6 @@ const Profile = () => {
       setProjectDescription("");
       setProjectTechStack("");
       setProjectLiveUrl("");
-      setProjectRepositoryUrl("");
     } catch (error) {
       setProjectError(
         error instanceof Error
@@ -207,7 +219,7 @@ const Profile = () => {
 
   // Save Profile
   const handleSave = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 

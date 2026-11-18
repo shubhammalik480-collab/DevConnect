@@ -15,7 +15,7 @@ import {
   type ConnectionDeveloper,
 } from "../services/connection.service";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const DeveloperProfile = () => {
   const { id } = useParams<{ id: string }>();

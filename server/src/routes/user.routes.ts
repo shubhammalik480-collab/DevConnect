@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { protect } from "../middleware/auth.middleware";
 import upload from "../middleware/upload.middleware";
-
+import validateImageContent from "../middleware/image-validation.middleware";
 import {
   getProfile,
   updateProfile,
@@ -22,6 +22,7 @@ router.post(
   "/profile/image",
   protect,
   upload.single("image"),
+  validateImageContent,
   uploadProfileImage
 );
 

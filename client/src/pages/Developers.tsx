@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./DeveloperProfile.css";
+import "./Developers.css";
 
 import {
   getDevelopers,
@@ -8,27 +8,16 @@ import {
   type Developer,
 } from "../services/developer.service";
 
-import "./Developers.css";
-
 const Developers = () => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sentRequests, setSentRequests] = useState<string[]>([]);
   const [connectionError, setConnectionError] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchDevelopers();
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const fetchDevelopers = async () => {
+  const fetchDevelopers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -44,7 +33,15 @@ const Developers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void fetchDevelopers();
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [fetchDevelopers]);
 
   const handleConnect = async (developerId: string) => {
     try {
@@ -53,7 +50,10 @@ const Developers = () => {
 
       await sendConnectionRequest(developerId);
 
-      setSentRequests((previous) => [...previous, developerId]);
+      setSentRequests((previous) => [
+        ...previous,
+        developerId,
+      ]);
     } catch (err) {
       setConnectionError(
         err instanceof Error
@@ -66,70 +66,68 @@ const Developers = () => {
   };
 
   return (
-    <main className="developers-page">
-      <div className="developers-container">
+    <main className="developers-container">
+      <div className="developers-content">
 
+        {/* Header */}
         <header className="developers-header">
           <h1>Discover Developers</h1>
           <p>
-            Connect with talented developers and explore their skills.
+            Connect with talented developers and grow your network.
           </p>
         </header>
 
+        {/* Search */}
         <div className="developers-search">
           <input
             type="text"
-            placeholder="Search by name, skill or location..."
+            placeholder="Search developers by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search developers"
           />
         </div>
 
-        <section className="developers-results">
-          <div className="developers-results-header">
-            <h2>{search ? "Search Results" : "All Developers"}</h2>
+        {/* Messages */}
+        {connectionError && (
+          <p className="developers-message section-error">
+            {connectionError}
+          </p>
+        )}
 
-            {!loading && !error && (
+        {error && (
+          <p className="developers-message section-error">
+            {error}
+          </p>
+        )}
+
+        {/* Loading */}
+        {loading ? (
+          <p className="developers-message">
+            Loading developers...
+          </p>
+        ) : developers.length === 0 ? (
+          <p className="developers-message">
+            No developers found.
+          </p>
+        ) : (
+          <>
+            <div className="developers-results">
+              <h2>Developers</h2>
               <p>{developers.length} developers found</p>
-            )}
-          </div>
-
-          {connectionError && (
-            <p className="connection-error">
-              {connectionError}
-            </p>
-          )}
-
-          {loading && (
-            <h3 className="developers-message">
-              Loading developers...
-            </h3>
-          )}
-
-          {!loading && error && (
-            <p className="developers-error">{error}</p>
-          )}
-
-          {!loading && !error && developers.length === 0 && (
-            <div className="developers-empty">
-              <h2>No developers found</h2>
-              <p>
-                Try searching with another name, skill or location.
-              </p>
             </div>
-          )}
 
-          {!loading && !error && developers.length > 0 && (
+            {/* Developer Cards */}
             <div className="developers-grid">
               {developers.map((developer) => (
                 <article
-                  className="developer-card"
                   key={developer.id}
+                  className="developer-card"
                 >
-                  <div className="developer-profile">
+
+                  {/* Developer Information */}
+                  <div className="developer-info">
+
                     <img
-                      className="developer-avatar"
                       src={
                         developer.avatar ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -137,44 +135,49 @@ const Developers = () => {
                         )}&background=random`
                       }
                       alt={developer.name}
+                      className="developer-avatar"
                     />
 
                     <h3>{developer.name}</h3>
 
+                    <p className="developer-bio">
+                      {developer.bio || "Developer on DevConnect"}
+                    </p>
+
                     <p className="developer-location">
                       📍 {developer.location || "Location not added"}
                     </p>
+
                   </div>
 
-                  <p className="developer-bio">
-                    {developer.bio || "No bio available"}
-                  </p>
-
+                  {/* Skills */}
                   <div className="developer-skills">
-                    <h4>Skills</h4>
-
-                    <div className="developer-skill-tags">
-                      {developer.skills.length > 0 ? (
-                        developer.skills.map((skill) => (
-                          <span key={skill.id}>
-                            {skill.name}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="no-skills">
-                          No skills added
-                        </span>
-                      )}
-                    </div>
+                    {developer.skills?.map((skill) => (
+                      <span
+                        key={skill.id}
+                        className="developer-skill"
+                      >
+                        {skill.name}
+                      </span>
+                    ))}
                   </div>
 
+                  {/* Statistics */}
                   <div className="developer-stats">
                     <span>
-                      📁 {developer._count.projects} Projects
+                      Projects: {developer._count?.projects ?? 0}
+                    </span>
+
+                    {" | "}
+
+                    <span>
+                      Blogs: {developer._count?.blogPosts ?? 0}
                     </span>
                   </div>
 
+                  {/* Actions */}
                   <div className="developer-actions">
+
                     <Link
                       to={`/developers/${developer.id}`}
                       className="view-profile-btn"
@@ -183,11 +186,7 @@ const Developers = () => {
                     </Link>
 
                     <button
-                      className={`connect-btn ${
-                        sentRequests.includes(developer.id)
-                          ? "request-sent"
-                          : ""
-                      }`}
+                      className="connect-btn"
                       onClick={() => handleConnect(developer.id)}
                       disabled={
                         sentRequests.includes(developer.id) ||
@@ -200,12 +199,15 @@ const Developers = () => {
                           ? "Request Sent ✓"
                           : "Connect +"}
                     </button>
+
                   </div>
+
                 </article>
               ))}
             </div>
-          )}
-        </section>
+          </>
+        )}
+
       </div>
     </main>
   );
