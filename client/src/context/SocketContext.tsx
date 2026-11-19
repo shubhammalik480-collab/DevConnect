@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 import { useAuth } from "./useAuth";
 import { SocketContext } from "./socket-context";
-
+import { SOCKET_URL } from "../config/api";
 import type {
   Notification,
   SocketContextType,
@@ -45,9 +45,9 @@ export const SocketProvider = ({
       return;
     }
 
-    const newSocket = io("http://localhost:5000", {
-      withCredentials: true,
-    });
+    const newSocket = io(SOCKET_URL, {
+  withCredentials: true,
+});
 
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);

@@ -8,7 +8,7 @@ import type { FormEvent } from "react";
 
 import { useAuth } from "../context/useAuth";
 import type { User } from "../context/auth.types";
-
+import { API_BASE_URL } from "../config/api";
 import {
   getSkills,
   addSkill,
@@ -23,7 +23,7 @@ import type { Project } from "../services/project.service";
 
 import "./Profile.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = API_BASE_URL;
 
 interface Skill {
   id: string;

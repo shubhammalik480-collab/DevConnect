@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/blogs";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/blogs`;
 
 export interface Blog {
   id: string;

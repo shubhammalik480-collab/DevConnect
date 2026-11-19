@@ -1,6 +1,10 @@
-const API_URL = "http://localhost:5000/api/users/developers";
-const CONNECTION_API_URL = "http://localhost:5000/api/connections";
-const SKILL_API_URL = "http://localhost:5000/api/skills";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/users/developers`;
+
+const CONNECTION_API_URL = `${API_BASE_URL}/connections`;
+
+const SKILL_API_URL = `${API_BASE_URL}/skills`;
 
 export interface Developer {
   id: string;

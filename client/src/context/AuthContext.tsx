@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-
+import { API_BASE_URL } from "../config/api";
 import {
   loginUser,
   registerUser,
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const checkAuth = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/users/profile",
+          `${API_BASE_URL}/users/profile`,
           {
             credentials: "include",
           }
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     const response = await fetch(
-      "http://localhost:5000/api/auth/logout",
+      `${API_BASE_URL}/auth/logout`,
       {
         method: "POST",
         credentials: "include",

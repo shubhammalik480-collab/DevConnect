@@ -22,13 +22,15 @@ const app = express();
 app.use(helmet());
 
 // CORS
+const allowedOrigin =
+  process.env.FRONTEND_URL || "http://localhost:5173";
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigin,
     credentials: true,
   })
 );
-
 // Body Parser
 app.use(express.json({ limit: "10kb" }));
 
