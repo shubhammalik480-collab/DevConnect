@@ -1,28 +1,32 @@
 # DevConnect – Developer Networking Platform
 
-A full-stack developer networking platform where developers can create profiles, showcase projects and skills, publish blogs, and connect with other developers.
+DevConnect is a full-stack developer networking platform designed to help developers connect, collaborate, share knowledge, and showcase their technical skills.
 
-## 🌐 Live Demo
+Developers can create professional profiles, showcase projects, publish technical blogs, discover other developers, and build meaningful professional connections.
 
-**Live Website:** https://dev-connect-three-drab.vercel.app
+## Live Application
 
-**Backend API:** https://devconnect-backend-punb.onrender.com
+- **Frontend:** https://dev-connect-three-drab.vercel.app
+- **Backend API:** https://devconnect-backend-punb.onrender.com
+- **Repository:** https://github.com/shubhammalik480-collab/DevConnect
 
-## ✨ Features
+## Features
 
-- User registration and login
-- JWT-based authentication
-- GitHub OAuth integration
-- Developer profiles
-- Project creation and management
-- Skills management
-- Blog creation and publishing
-- Developer connections
-- Dashboard and activity tracking
-- Real-time communication using Socket.IO
-- Image uploads using Cloudinary
+- User registration and login with JWT authentication.
+- GitHub OAuth authentication.
+- Developer profiles with skills and personal information.
+- Project creation and management.
+- Developer discovery and search.
+- Professional connections between developers.
+- Skill endorsements.
+- Technical blog publishing and editing.
+- Markdown-based blog editor.
+- User dashboard.
+- Real-time communication using Socket.IO.
+- Image uploads using Cloudinary.
+- Responsive user interface.
 
-## 🛠️ Tech Stack
+## Technology Stack
 
 ### Frontend
 - React
@@ -36,32 +40,43 @@ A full-stack developer networking platform where developers can create profiles,
 - TypeScript
 - Socket.IO
 - Passport.js
-- JWT Authentication
+- JWT
+- Helmet
+- Express Rate Limit
 
 ### Database
 - PostgreSQL
 - Prisma ORM
-- Neon Database
+- Neon PostgreSQL
 
-### Deployment
-- Frontend: Vercel
-- Backend: Render
-- Database: Neon
+### Authentication
+- JWT Authentication
+- Cookie-based authentication
+- GitHub OAuth
+- Passport.js
 
-## 📁 Project Structure
+### Cloud Services and Deployment
+- Vercel – Frontend Hosting
+- Render – Backend Hosting
+- Neon – Database Hosting
+- Cloudinary – Image Storage
+
+## Project Structure
 
 ```text
 DevConnect/
 │
-├── client/                 # React frontend
-│   └── src/
-│       ├── components/
-│       ├── context/
-│       ├── pages/
-│       ├── services/
-│       └── config/
+├── client/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── config/
+│   └── README.md
 │
-├── server/                 # Node.js backend
+├── server/
 │   ├── prisma/
 │   └── src/
 │       ├── config/
@@ -70,39 +85,51 @@ DevConnect/
 │       ├── routes/
 │       └── services/
 │
-├── shared/                 # Shared code
 └── README.md
 ```
 
-## ⚙️ Local Setup
+## Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+
+Make sure you have installed:
+
+- Node.js
+- npm
+- Git
+- PostgreSQL database or Neon PostgreSQL account
+
+### 1. Clone Repository
 
 ```bash
 git clone https://github.com/shubhammalik480-collab/DevConnect.git
+
 cd DevConnect
 ```
 
-### 2. Setup Backend
+### 2. Backend Setup
 
 ```bash
 cd server
 npm install
 ```
 
-Create a `.env` file inside the `server` directory and configure the required environment variables.
+Create a `.env` file inside the `server` directory.
 
-Required variables:
+Configure the following environment variables:
 
 ```env
 PORT=5000
-DATABASE_URL=
-JWT_SECRET=
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
+DATABASE_URL=your_database_connection_string
+JWT_SECRET=your_jwt_secret
+
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
 FRONTEND_URL=http://localhost:5173
 BACKEND_URL=http://localhost:5000
 ```
@@ -111,7 +138,7 @@ Generate Prisma Client and apply database migrations:
 
 ```bash
 npx prisma generate
-npx prisma migrate deploy
+npx prisma migrate dev
 ```
 
 Build and start the backend:
@@ -121,7 +148,7 @@ npm run build
 npm start
 ```
 
-### 3. Setup Frontend
+### 3. Frontend Setup
 
 Open another terminal:
 
@@ -137,32 +164,43 @@ VITE_API_URL=http://localhost:5000/api
 VITE_SOCKET_URL=http://localhost:5000
 ```
 
-Start the frontend:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-## 🔐 Environment Variables
+The frontend will be available at:
 
-Never commit `.env` files, database passwords, API secrets, or private OAuth credentials to GitHub.
+```text
+http://localhost:5173
+```
 
-Configure production environment variables through the respective deployment platforms.
+## Deployment
 
-## 🚀 Deployment
+DevConnect is deployed using the following services:
 
-- Frontend is deployed on Vercel.
-- Backend and Socket.IO server are deployed on Render.
-- PostgreSQL database is hosted on Neon.
-- Cloudinary handles image uploads.
+| Component | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Neon PostgreSQL |
+| Image Storage | Cloudinary |
 
-## 🧪 Testing
+## Security
 
-The project includes backend tests and frontend production build checks.
+The backend implements several security measures:
 
-Production deployment was verified through registration, login, dashboard, profile, projects, blogs, connections, and logout workflows.
+- JWT-based authentication.
+- HTTP security headers using Helmet.
+- CORS configuration.
+- CSRF protection.
+- API rate limiting.
+- HTTP-only authentication cookies.
+- Request body size restrictions.
+- Image upload validation.
 
-## 👨‍💻 Author
+## Author
 
 **Shubham Malik**
 
@@ -172,4 +210,4 @@ GitHub: https://github.com/shubhammalik480-collab
 
 ---
 
-⭐ If you find this project useful, consider giving it a star!
+Developed as part of the Code-A-Nova Full Stack Development Internship.

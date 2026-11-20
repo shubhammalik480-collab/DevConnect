@@ -96,9 +96,16 @@ const Profile = () => {
     }
   }, []);
 
+  // Load Skills and Projects
   useEffect(() => {
-    void fetchSkills();
-    void fetchProjects();
+    const timer = window.setTimeout(() => {
+      void fetchSkills();
+      void fetchProjects();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, [fetchSkills, fetchProjects]);
 
   // Add Skill
@@ -281,7 +288,6 @@ const Profile = () => {
 
   return (
     <main className="profile-page">
-
       <div className="profile-content">
 
         {/* Page Heading */}
@@ -309,7 +315,6 @@ const Profile = () => {
 
         {/* Profile Hero */}
         <section className="profile-hero">
-
           <div className="profile-cover">
             <span className="profile-cover-code">
               {"</>"}
@@ -317,7 +322,6 @@ const Profile = () => {
           </div>
 
           <div className="profile-hero-content">
-
             <div className="profile-avatar">
               {user.avatar ? (
                 <img src={user.avatar} alt={user.name} />
@@ -329,9 +333,9 @@ const Profile = () => {
             </div>
 
             <div className="profile-info">
-
               <div className="profile-name-row">
                 <h2>{user.name}</h2>
+
                 <span className="profile-member-badge">
                   ✓ DevConnect Member
                 </span>
@@ -348,14 +352,11 @@ const Profile = () => {
               <p className="profile-location">
                 📍 {user.location || "Location not added"}
               </p>
-
             </div>
-
           </div>
 
           {/* Profile Statistics */}
           <div className="profile-statistics">
-
             <div className="profile-stat">
               <strong>{projects.length}</strong>
               <span>Projects</span>
@@ -370,20 +371,18 @@ const Profile = () => {
               <strong>{projects.length + skills.length}</strong>
               <span>Contributions</span>
             </div>
-
           </div>
-
         </section>
 
         {/* Edit Profile Form */}
         {isEditing && (
           <section className="profile-section">
-
             <div className="profile-section-heading">
               <div>
                 <span className="profile-eyebrow">
                   PERSONAL INFORMATION
                 </span>
+
                 <h2>Edit Your Profile</h2>
               </div>
             </div>
@@ -392,9 +391,7 @@ const Profile = () => {
               className="profile-form"
               onSubmit={handleSave}
             >
-
               <div className="profile-form-grid">
-
                 <div className="profile-form-group">
                   <label>Name</label>
 
@@ -445,7 +442,6 @@ const Profile = () => {
                     </small>
                   )}
                 </div>
-
               </div>
 
               {error && (
@@ -453,7 +449,6 @@ const Profile = () => {
               )}
 
               <div className="profile-form-actions">
-
                 <button
                   type="submit"
                   className="profile-primary-btn"
@@ -470,16 +465,13 @@ const Profile = () => {
                 >
                   Cancel
                 </button>
-
               </div>
-
             </form>
           </section>
         )}
 
         {/* Skills Section */}
         <section className="profile-section">
-
           <div className="profile-section-heading">
             <div>
               <span className="profile-eyebrow">
@@ -502,7 +494,6 @@ const Profile = () => {
             className="profile-add-form"
             onSubmit={handleAddSkill}
           >
-
             <input
               type="text"
               placeholder="Enter skill (e.g. C++, React)"
@@ -526,7 +517,6 @@ const Profile = () => {
             >
               {addingSkill ? "Adding..." : "+ Add Skill"}
             </button>
-
           </form>
 
           {skillError && (
@@ -542,31 +532,23 @@ const Profile = () => {
               <p>Add your first skill to showcase your expertise.</p>
             </div>
           ) : (
-
             <div className="skills-grid">
-
               {skills.map((skill) => (
                 <article className="skill-card" key={skill.id}>
-
                   <div className="skill-card-icon">✦</div>
 
                   <div>
                     <h3>{skill.name}</h3>
                     <p>{skill.level || "Level not specified"}</p>
                   </div>
-
                 </article>
               ))}
-
             </div>
-
           )}
-
         </section>
 
         {/* Projects Section */}
         <section className="profile-section">
-
           <div className="profile-section-heading">
             <div>
               <span className="profile-eyebrow">
@@ -589,7 +571,6 @@ const Profile = () => {
             className="profile-project-form"
             onSubmit={handleAddProject}
           >
-
             <div className="profile-form-group">
               <label>Project Title</label>
 
@@ -632,7 +613,6 @@ const Profile = () => {
             </div>
 
             <div className="profile-form-grid">
-
               <div className="profile-form-group">
                 <label>Live Project URL</label>
 
@@ -658,7 +638,6 @@ const Profile = () => {
                   }
                 />
               </div>
-
             </div>
 
             {projectError && (
@@ -672,30 +651,24 @@ const Profile = () => {
             >
               {addingProject ? "Adding Project..." : "+ Add Project"}
             </button>
-
           </form>
 
           {/* Project Cards */}
           {projectsLoading ? (
             <p className="profile-muted">Loading projects...</p>
           ) : projects.length === 0 ? (
-
             <div className="profile-empty">
               <span>⌘</span>
               <h3>No projects added yet</h3>
               <p>Your projects will appear here once you add them.</p>
             </div>
-
           ) : (
-
             <div className="projects-grid">
-
               {projects.map((project) => (
                 <article
                   className="project-card"
                   key={project.id}
                 >
-
                   <div className="project-card-icon">
                     {"</>"}
                   </div>
@@ -705,17 +678,14 @@ const Profile = () => {
                   <p>{project.description}</p>
 
                   <div className="project-tags">
-
                     {project.techStack.map((tech, index) => (
                       <span key={`${project.id}-${index}`}>
                         {tech}
                       </span>
                     ))}
-
                   </div>
 
                   <div className="project-links">
-
                     {project.liveUrl && (
                       <a
                         href={project.liveUrl}
@@ -735,16 +705,11 @@ const Profile = () => {
                         GitHub Repository ↗
                       </a>
                     )}
-
                   </div>
-
                 </article>
               ))}
-
             </div>
-
           )}
-
         </section>
 
         <footer className="profile-footer">
