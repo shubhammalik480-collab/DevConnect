@@ -17,17 +17,15 @@ import {
 
 import { useAuth } from "../context/useAuth";
 
+import "./DeveloperProfile.css";
+
 const DeveloperProfile = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
 
   const [developer, setDeveloper] = useState<DeveloperData | null>(null);
-
   const [skills, setSkills] = useState<SkillWithEndorsements[]>([]);
-
-  const [mutualConnections, setMutualConnections] = useState<
-    ConnectionDeveloper[]
-  >([]);
+  const [mutualConnections, setMutualConnections] = useState<ConnectionDeveloper[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [mutualLoading, setMutualLoading] = useState(true);
@@ -37,16 +35,9 @@ const DeveloperProfile = () => {
   const [mutualError, setMutualError] = useState("");
   const [endorsementError, setEndorsementError] = useState("");
   const [actionError, setActionError] = useState("");
-
-  const [processingSkillId, setProcessingSkillId] = useState<string | null>(
-    null
-  );
-
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ==========================================
-  // FETCH DEVELOPER PROFILE
-  // ==========================================
+  const [processingSkillId, setProcessingSkillId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDeveloper = async () => {
@@ -63,27 +54,20 @@ const DeveloperProfile = () => {
         const data = await getDeveloperById(id);
         setDeveloper(data);
 
-        // Fetch skills and endorsements
         setEndorsementLoading(true);
         setEndorsementError("");
 
         try {
-          const endorsementData = await getUserSkillsWithEndorsements(
-            data.id
-          );
-
+          const endorsementData = await getUserSkillsWithEndorsements(data.id);
           setSkills(endorsementData);
         } catch (err) {
           setEndorsementError(
-            err instanceof Error
-              ? err.message
-              : "Failed to load endorsements"
+            err instanceof Error ? err.message : "Failed to load endorsements"
           );
         } finally {
           setEndorsementLoading(false);
         }
 
-        // Mutual connections are not requested on own profile.
         if (data.id === user?.id) {
           setMutualConnections([]);
           setMutualLoading(false);
@@ -98,32 +82,26 @@ const DeveloperProfile = () => {
           setMutualConnections(mutualData);
         } catch (err) {
           setMutualError(
-            err instanceof Error
-              ? err.message
-              : "Failed to load mutual connections"
+            err instanceof Error ? err.message : "Failed to load mutual connections"
           );
         } finally {
           setMutualLoading(false);
         }
       } catch (err) {
         setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load developer profile"
+          err instanceof Error ? err.message : "Failed to load developer profile"
         );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDeveloper();
+    void fetchDeveloper();
   }, [id, user?.id]);
 
-  // ==========================================
-  // ENDORSE SKILL
-  // ==========================================
-
   const handleEndorse = async (skillId: string) => {
+    if (!developer) return;
+
     try {
       setProcessingSkillId(skillId);
       setActionError("");
@@ -131,12 +109,9 @@ const DeveloperProfile = () => {
 
       await endorseSkill(skillId);
 
-      // Refresh skills and endorsement counts
-      const updatedSkills = await getUserSkillsWithEndorsements(
-        developer!.id
-      );
-
+      const updatedSkills = await getUserSkillsWithEndorsements(developer.id);
       setSkills(updatedSkills);
+
       setSuccessMessage("Skill endorsed successfully!");
     } catch (err) {
       setActionError(
@@ -147,11 +122,9 @@ const DeveloperProfile = () => {
     }
   };
 
-  // ==========================================
-  // REMOVE ENDORSEMENT
-  // ==========================================
-
   const handleRemoveEndorsement = async (skillId: string) => {
+    if (!developer) return;
+
     try {
       setProcessingSkillId(skillId);
       setActionError("");
@@ -159,44 +132,39 @@ const DeveloperProfile = () => {
 
       await removeEndorsement(skillId);
 
-      const updatedSkills = await getUserSkillsWithEndorsements(
-        developer!.id
-      );
-
+      const updatedSkills = await getUserSkillsWithEndorsements(developer.id);
       setSkills(updatedSkills);
+
       setSuccessMessage("Endorsement removed successfully!");
     } catch (err) {
       setActionError(
-        err instanceof Error
-          ? err.message
-          : "Failed to remove endorsement"
+        err instanceof Error ? err.message : "Failed to remove endorsement"
       );
     } finally {
       setProcessingSkillId(null);
     }
   };
 
-  // ==========================================
-  // LOADING STATE
-  // ==========================================
+  const getAvatar = (name: string, avatar?: string | null) =>
+    avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4f46e5&color=fff`;
 
   if (loading) {
     return (
-      <h2 style={{ textAlign: "center", marginTop: "80px" }}>
-        Loading developer profile...
-      </h2>
+      <div className="developer-profile-state">
+        <div className="developer-spinner" />
+        <h3>Loading developer profile...</h3>
+      </div>
     );
   }
 
-  // ==========================================
-  // ERROR STATE
-  // ==========================================
-
   if (error || !developer) {
     return (
-      <div style={{ textAlign: "center", marginTop: "80px" }}>
+      <div className="developer-profile-state">
         <h2>{error || "Developer not found"}</h2>
-        <Link to="/developers">Back to Developers</Link>
+        <Link to="/developers" className="developer-back-btn">
+          Back to Developers
+        </Link>
       </div>
     );
   }
@@ -208,263 +176,202 @@ const DeveloperProfile = () => {
 
   const isOwnProfile = developer.id === user?.id;
 
-  // ==========================================
-  // MAIN UI
-  // ==========================================
+  const statistics = [
+    { label: "Technical Skills", value: skills.length, icon: "✦" },
+    { label: "Projects", value: developer._count.projects, icon: "⌘" },
+    { label: "Blog Posts", value: developer._count.blogPosts, icon: "▤" },
+    { label: "Mutual Connections", value: mutualConnections.length, icon: "♧" },
+    { label: "Endorsements", value: totalEndorsements, icon: "★" },
+  ];
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        padding: "40px 20px",
-      }}
-    >
-      <div style={{ maxWidth: "1000px", margin: "auto" }}>
-        <Link
-          to="/developers"
-          style={{
-            color: "#2563eb",
-            textDecoration: "none",
-            fontWeight: "600",
-          }}
-        >
-          ← Back to Developers
-        </Link>
+    <main className="developer-profile-page">
+      <div className="developer-profile-container">
+
+        <div className="developer-profile-top">
+          <Link to="/developers" className="developer-back-link">
+            ← Back to Developers
+          </Link>
+
+          <span className="developer-top-label">
+            DEVCONNECT COMMUNITY
+          </span>
+        </div>
 
         {/* PROFILE HEADER */}
 
-        <div
-          style={{
-            background: "white",
-            padding: "35px",
-            borderRadius: "16px",
-            marginTop: "25px",
-            textAlign: "center",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.05)",
-          }}
-        >
-          <img
-  src={
-    developer.avatar ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      developer.name
-    )}&background=random`
-  }
-  alt={developer.name}
-  className="developer-profile-avatar"
-/>
-
-<h1 className="developer-profile-name">
-  {developer.name}
-</h1>
-
-<p className="developer-profile-location">
-  {developer.location || "Location not added"}
-</p>
-
-<p className="developer-profile-bio">
-  {developer.bio || "No bio available"}
-</p>
-
-         
-        </div>
-
-       {/* STATISTICS */}
-
-<div className="developer-stats-grid">
-  {[
-    {
-      label: "Total Skills",
-      value: skills.length,
-    },
-    {
-      label: "Projects",
-      value: developer._count.projects,
-    },
-    {
-      label: "Blog Posts",
-      value: developer._count.blogPosts,
-    },
-    {
-      label: "Mutual Connections",
-      value: mutualConnections.length,
-    },
-    {
-      label: "Total Endorsements",
-      value: totalEndorsements,
-    },
-  ].map((item) => (
-    <div key={item.label} className="developer-stat-card">
-      <h2>{item.value}</h2>
-      <p>{item.label}</p>
-    </div>
-  ))}
-</div>
-
-   {/* MUTUAL CONNECTIONS */}
-
-<section className="developer-section">
-  <h2 className="developer-section-title">
-    Mutual Connections
-  </h2>
-
-  <p className="developer-section-description">
-    People you both are connected with.
-  </p>
-
-  {mutualLoading ? (
-    <p className="section-loading">Loading mutual connections...</p>
-  ) : mutualError ? (
-    <p className="section-error">{mutualError}</p>
-  ) : mutualConnections.length === 0 ? (
-    <p className="section-empty">
-      No mutual connections yet.
-    </p>
-  ) : (
-    <div className="mutual-connections-grid">
-      {mutualConnections.map((person) => (
-        <div
-          key={person.id}
-          className="mutual-connection-card"
-        >
-          <img
-            src={
-              person.avatar ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                person.name
-              )}&background=random`
-            }
-            alt={person.name}
-            className="mutual-connection-avatar"
-          />
-
-          <div className="mutual-connection-info">
-            <h4>{person.name}</h4>
-
-            <p>
-              {person.location || "Location not added"}
-            </p>
+        <section className="developer-hero-card">
+          <div className="developer-cover">
+            <span className="developer-cover-code">&lt;/&gt;</span>
           </div>
-        </div>
-      ))}
-    </div>
-  )}
-</section>     
+
+          <div className="developer-identity">
+            <img
+              src={getAvatar(developer.name, developer.avatar)}
+              alt={developer.name}
+              className="developer-profile-avatar"
+            />
+
+            <div className="developer-identity-info">
+              <div className="developer-name-row">
+                <h1>{developer.name}</h1>
+                <span className="developer-member-badge">
+                  ✓ DevConnect Member
+                </span>
+              </div>
+
+              <p className="developer-profile-location">
+                📍 {developer.location || "Location not added"}
+              </p>
+
+              <p className="developer-profile-bio">
+                {developer.bio || "This developer hasn't added a bio yet."}
+              </p>
+            </div>
+          </div>
+
+          <div className="developer-hero-footer">
+            <span>Building connections. Sharing knowledge.</span>
+            <span className="developer-online-badge">
+              <span /> Community Member
+            </span>
+          </div>
+        </section>
+
+        {/* STATISTICS */}
+
+        <section className="developer-stats-grid">
+          {statistics.map((item, index) => (
+            <div className="developer-stat-card" key={item.label}>
+              <div className={`developer-stat-icon stat-color-${index}`}>
+                {item.icon}
+              </div>
+
+              <div>
+                <h2>{item.value}</h2>
+                <p>{item.label}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* MUTUAL CONNECTIONS */}
+
+        {!isOwnProfile && (
+          <section className="developer-section">
+            <div className="developer-section-heading">
+              <div>
+                <span className="developer-eyebrow">YOUR NETWORK</span>
+                <h2>Mutual Connections</h2>
+                <p>People you both are connected with.</p>
+              </div>
+
+              <span className="developer-section-count">
+                {mutualConnections.length}
+              </span>
+            </div>
+
+            {mutualLoading ? (
+              <p className="developer-info-message">
+                Loading mutual connections...
+              </p>
+            ) : mutualError ? (
+              <p className="developer-error">{mutualError}</p>
+            ) : mutualConnections.length === 0 ? (
+              <div className="developer-empty">
+                <span>♧</span>
+                <h3>No mutual connections yet</h3>
+                <p>Your shared network will appear here.</p>
+              </div>
+            ) : (
+              <div className="mutual-connections-grid">
+                {mutualConnections.map((person) => (
+                  <div className="mutual-connection-card" key={person.id}>
+                    <img
+                      src={getAvatar(person.name, person.avatar)}
+                      alt={person.name}
+                      className="mutual-connection-avatar"
+                    />
+
+                    <div className="mutual-connection-info">
+                      <h4>{person.name}</h4>
+                      <p>{person.location || "Location not added"}</p>
+                    </div>
+
+                    <span className="mutual-connected-icon">✓</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* SKILLS AND ENDORSEMENTS */}
 
-        <section
-          style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "14px",
-            marginTop: "25px",
-          }}
-        >
-          <h2>🏆 Technical Skills & Endorsements</h2>
+        <section className="developer-section">
+          <div className="developer-section-heading">
+            <div>
+              <span className="developer-eyebrow">TECHNICAL EXPERTISE</span>
+              <h2>Skills & Endorsements</h2>
+              <p>Explore skills and recognize technical expertise.</p>
+            </div>
 
-          <p style={{ color: "#64748b" }}>
-            Skills are ranked according to their endorsement count.
-          </p>
+            <span className="developer-section-count">
+              {skills.length} Skills
+            </span>
+          </div>
 
           {successMessage && (
-            <p
-              style={{
-                background: "#dcfce7",
-                color: "#15803d",
-                padding: "12px",
-                borderRadius: "8px",
-              }}
-            >
-              {successMessage}
-            </p>
+            <div className="developer-success">{successMessage}</div>
           )}
 
           {actionError && (
-            <p
-              style={{
-                background: "#fee2e2",
-                color: "#dc2626",
-                padding: "12px",
-                borderRadius: "8px",
-              }}
-            >
-              {actionError}
-            </p>
+            <div className="developer-error">{actionError}</div>
           )}
 
           {endorsementLoading ? (
-            <p style={{ color: "#64748b" }}>
+            <p className="developer-info-message">
               Loading skills and endorsements...
             </p>
           ) : endorsementError ? (
-            <p style={{ color: "#dc2626" }}>{endorsementError}</p>
+            <p className="developer-error">{endorsementError}</p>
           ) : skills.length === 0 ? (
-            <p style={{ color: "#64748b" }}>
-              No skills added yet.
-            </p>
+            <div className="developer-empty">
+              <span>✦</span>
+              <h3>No skills added yet</h3>
+              <p>Skills will appear here when added to the profile.</p>
+            </div>
           ) : (
-            <div style={{ display: "grid", gap: "18px", marginTop: "20px" }}>
+            <div className="developer-skills-list">
               {skills.map((skill, index) => {
                 const alreadyEndorsed = skill.endorsements.some(
-                  (endorsement) =>
-                    endorsement.fromUserId === user?.id
+                  (endorsement) => endorsement.fromUserId === user?.id
                 );
 
                 const isProcessing = processingSkillId === skill.id;
 
                 return (
-                  <div
-                    key={skill.id}
-                    style={{
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      padding: "20px",
-                      background: "#ffffff",
-                    }}
-                  >
-                    {/* Skill Header */}
+                  <article className="developer-skill-card" key={skill.id}>
+                    <div className="developer-skill-main">
+                      <div className="developer-skill-icon">✦</div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        gap: "10px",
-                      }}
-                    >
-                      <div>
-                        <h3 style={{ margin: "0 0 7px", color: "#1e293b" }}>
+                      <div className="developer-skill-info">
+                        <h3>
                           {index === 0 && skill._count.endorsements > 0
                             ? "🏆 "
                             : ""}
                           {skill.name}
                         </h3>
 
-                        {skill.level && (
-                          <span style={{ color: "#64748b", fontSize: "13px" }}>
-                            Level: {skill.level}
-                          </span>
-                        )}
+                        <span>
+                          {skill.level || "Level not specified"}
+                        </span>
                       </div>
 
-                      <span
-                        style={{
-                          background: "#dbeafe",
-                          color: "#1d4ed8",
-                          padding: "8px 14px",
-                          borderRadius: "20px",
-                          fontWeight: "600",
-                          fontSize: "13px",
-                        }}
-                      >
+                      <div className="skill-endorsement-count">
                         👍 {skill._count.endorsements} Endorsements
-                      </span>
+                      </div>
                     </div>
-
-                    {/* Endorse Button */}
 
                     {!isOwnProfile && (
                       <button
@@ -474,91 +381,45 @@ const DeveloperProfile = () => {
                             : handleEndorse(skill.id)
                         }
                         disabled={isProcessing}
-                        style={{
-                          marginTop: "15px",
-                          padding: "10px 18px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: alreadyEndorsed
-                            ? "#fee2e2"
-                            : "#2563eb",
-                          color: alreadyEndorsed ? "#dc2626" : "white",
-                          fontWeight: "600",
-                          cursor: isProcessing ? "not-allowed" : "pointer",
-                          opacity: isProcessing ? 0.6 : 1,
-                        }}
+                        className={
+                          alreadyEndorsed
+                            ? "endorse-button endorsed"
+                            : "endorse-button"
+                        }
                       >
                         {isProcessing
                           ? "Processing..."
                           : alreadyEndorsed
-                          ? "✓ Endorsed (Remove)"
-                          : "👍 Endorse Skill"}
+                            ? "✓ Endorsed · Remove"
+                            : "👍 Endorse Skill"}
                       </button>
                     )}
 
-                    {/* Endorsers List */}
-
                     {skill.endorsements.length > 0 && (
-                      <div
-                        style={{
-                          marginTop: "20px",
-                          borderTop: "1px solid #e2e8f0",
-                          paddingTop: "15px",
-                        }}
-                      >
-                        <h4 style={{ color: "#334155" }}>
-                          Endorsed by
-                        </h4>
+                      <div className="skill-endorsers">
+                        <h4>Endorsed by</h4>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: "15px",
-                          }}
-                        >
+                        <div className="endorsers-list">
                           {skill.endorsements.map((endorsement) => (
                             <div
+                              className="endorser-item"
                               key={endorsement.id}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                background: "#f8fafc",
-                                padding: "8px 12px",
-                                borderRadius: "8px",
-                              }}
                             >
                               <img
-                                src={
-                                  endorsement.fromUser.avatar ||
-                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                    endorsement.fromUser.name
-                                  )}&background=random`
-                                }
+                                src={getAvatar(
+                                  endorsement.fromUser.name,
+                                  endorsement.fromUser.avatar
+                                )}
                                 alt={endorsement.fromUser.name}
-                                style={{
-                                  width: "35px",
-                                  height: "35px",
-                                  borderRadius: "50%",
-                                  objectFit: "cover",
-                                }}
                               />
 
-                              <span
-                                style={{
-                                  fontSize: "13px",
-                                  color: "#334155",
-                                }}
-                              >
-                                {endorsement.fromUser.name}
-                              </span>
+                              <span>{endorsement.fromUser.name}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                  </div>
+                  </article>
                 );
               })}
             </div>
@@ -567,68 +428,51 @@ const DeveloperProfile = () => {
 
         {/* PROJECTS */}
 
-        <section
-          style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "14px",
-            marginTop: "25px",
-          }}
-        >
-          <h2>Projects</h2>
+        <section className="developer-section">
+          <div className="developer-section-heading">
+            <div>
+              <span className="developer-eyebrow">BUILT WITH PASSION</span>
+              <h2>Projects</h2>
+              <p>Explore the work and projects built by this developer.</p>
+            </div>
+
+            <span className="developer-section-count">
+              {developer.projects.length} Projects
+            </span>
+          </div>
 
           {developer.projects.length === 0 ? (
-            <p style={{ color: "#64748b" }}>
-              No projects added yet.
-            </p>
+            <div className="developer-empty">
+              <span>⌘</span>
+              <h3>No projects added yet</h3>
+              <p>Projects will appear here when added to the profile.</p>
+            </div>
           ) : (
-            <div style={{ display: "grid", gap: "18px" }}>
+            <div className="developer-projects-grid">
               {developer.projects.map((project) => (
-                <div
-                  key={project.id}
-                  style={{
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "10px",
-                    padding: "20px",
-                  }}
-                >
+                <article className="developer-project-card" key={project.id}>
+                  <div className="project-icon">&lt;/&gt;</div>
+
                   <h3>{project.title}</h3>
 
-                  <p style={{ color: "#64748b", lineHeight: "1.6" }}>
+                  <p className="project-description">
                     {project.description}
                   </p>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "8px",
-                      margin: "15px 0",
-                    }}
-                  >
+                  <div className="project-tech-stack">
                     {project.techStack.map((tech, index) => (
-                      <span
-                        key={`${tech}-${index}`}
-                        style={{
-                          background: "#f1f5f9",
-                          padding: "6px 10px",
-                          borderRadius: "6px",
-                          fontSize: "13px",
-                        }}
-                      >
-                        {tech}
-                      </span>
+                      <span key={`${tech}-${index}`}>{tech}</span>
                     ))}
                   </div>
 
-                  <div style={{ display: "flex", gap: "15px" }}>
+                  <div className="project-links">
                     {project.liveUrl && (
                       <a
                         href={project.liveUrl}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Live Demo
+                        Live Demo ↗
                       </a>
                     )}
 
@@ -638,17 +482,21 @@ const DeveloperProfile = () => {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Source Code
+                        GitHub Repository ↗
                       </a>
                     )}
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
         </section>
+
+        <footer className="developer-profile-footer">
+          Made for developers, built for connections. ✦
+        </footer>
       </div>
-    </div>
+    </main>
   );
 };
 

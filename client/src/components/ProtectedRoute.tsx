@@ -1,24 +1,25 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Navbar from "./Navbar";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
-  // Wait until authentication check completes
   if (loading) {
     return <h2>Loading...</h2>;
   }
 
-  // Redirect unauthenticated users
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Show Navbar on all protected pages
+  // Hide Navbar only on Dashboard
+  const isDashboard = location.pathname === "/dashboard";
+
   return (
     <>
-      <Navbar />
+      {!isDashboard && <Navbar />}
       <Outlet />
     </>
   );

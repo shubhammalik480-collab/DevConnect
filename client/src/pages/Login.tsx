@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import "./Auth.css";
 
 const Login = () => {
   const { login } = useAuth();
@@ -27,43 +28,99 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h1>Welcome to DevConnect</h1>
-      <h2>Login</h2>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="auth-page">
+      <section className="auth-brand-panel">
+        <div className="auth-brand">
+          Dev<span>Connect</span>.
         </div>
 
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <div className="auth-brand-content">
+          <h1>Where developers connect and grow together.</h1>
+
+          <p>
+            Build your network, showcase your work, share knowledge
+            and discover opportunities with developers worldwide.
+          </p>
+
+          <div className="auth-features">
+            <div className="auth-feature">
+              <span className="auth-feature-icon">✦</span>
+              Connect with talented developers
+            </div>
+
+            <div className="auth-feature">
+              <span className="auth-feature-icon">⌘</span>
+              Showcase your projects and skills
+            </div>
+
+            <div className="auth-feature">
+              <span className="auth-feature-icon">↗</span>
+              Grow your professional network
+            </div>
+          </div>
         </div>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className="auth-footer">
+          © 2026 DevConnect. Built for developers.
+        </div>
+      </section>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+      <section className="auth-form-panel">
+        <div className="auth-card">
+          <div className="auth-mobile-brand">
+            Dev<span>Connect</span>.
+          </div>
 
-      <p>
-        Don't have an account? <Link to="/register">Register</Link>
-      </p>
+          <h2>Welcome back 👋</h2>
+
+          <p className="auth-subtitle">
+            Sign in to continue your developer journey.
+          </p>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="auth-field">
+              <label htmlFor="email">Email address</label>
+
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="password">Password</label>
+
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && <p className="auth-error">{error}</p>}
+
+            <button
+              className="auth-submit"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign in to DevConnect →"}
+            </button>
+          </form>
+
+          <p className="auth-switch">
+            Don't have an account?{" "}
+            <Link to="/register">Create an account</Link>
+          </p>
+        </div>
+      </section>
     </div>
   );
 };

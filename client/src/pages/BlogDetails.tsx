@@ -3,13 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import {
-  getBlogBySlug,
-} from "../services/blog.service";
-
+import { getBlogBySlug } from "../services/blog.service";
 import type { Blog } from "../services/blog.service";
 
 import "@uiw/react-markdown-preview/markdown.css";
+import "./BlogDetails.css";
 
 const BlogDetails = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -21,16 +19,19 @@ const BlogDetails = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         if (!slug) {
           throw new Error("Invalid blog URL");
         }
 
         const data = await getBlogBySlug(slug);
         setBlog(data);
-      } catch (error) {
+      } catch (err) {
         setError(
-          error instanceof Error
-            ? error.message
+          err instanceof Error
+            ? err.message
             : "Failed to load blog"
         );
       } finally {
@@ -38,100 +39,149 @@ const BlogDetails = () => {
       }
     };
 
-    fetchBlog();
+    void fetchBlog();
   }, [slug]);
 
   if (loading) {
-    return <h2 style={{ textAlign: "center" }}>Loading blog...</h2>;
-  }
-
-  if (error || !blog) {
     return (
-      <div style={{ textAlign: "center", margin: "50px" }}>
-        <h2>{error || "Blog not found"}</h2>
-        <Link to="/blogs">Back to Blogs</Link>
+      <div className="blog-details-state">
+        <div className="blog-details-spinner" />
+        <h3>Loading article...</h3>
+        <p>Getting the latest story for you.</p>
       </div>
     );
   }
 
+  if (error || !blog) {
+    return (
+      <div className="blog-details-state">
+        <div className="blog-error-icon">!</div>
+        <h2>{error || "Blog not found"}</h2>
+        <p>The article may have been removed or is unavailable.</p>
+
+        <Link to="/blogs" className="blog-back-btn">
+          ← Back to Blogs
+        </Link>
+      </div>
+    );
+  }
+
+  const formattedDate = new Date(blog.createdAt).toLocaleDateString(
+    "en-IN",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  );
+
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "40px auto",
-        padding: "25px",
-      }}
-    >
-      <Link
-        to="/blogs"
-        style={{
-          color: "#2563eb",
-          textDecoration: "none",
-          fontWeight: "bold",
-        }}
-      >
-        ← Back to Blogs
-      </Link>
+    <main className="blog-details-page">
+      {/* Top Navigation */}
+      <div className="article-topbar">
+        <Link to="/blogs" className="article-back-link">
+          <span>←</span> Back to Blogs
+        </Link>
 
-      {blog.coverImage && (
-        <img
-          src={blog.coverImage}
-          alt={blog.title}
-          style={{
-            width: "100%",
-            maxHeight: "400px",
-            objectFit: "cover",
-            borderRadius: "12px",
-            marginTop: "25px",
-          }}
-        />
-      )}
+        <span className="article-category">
+          DEVCONNECT STORIES
+        </span>
+      </div>
 
-      <header style={{ marginTop: "30px" }}>
-        <h1 style={{ fontSize: "36px", color: "#0f172a" }}>
-          {blog.title}
-        </h1>
+      {/* Article */}
+      <article className="article-wrapper">
 
-        <p style={{ color: "#64748b", marginTop: "12px" }}>
-          By {blog.user.name}
-        </p>
+        {/* Article Header */}
+        <header className="article-header">
 
-        <p style={{ color: "#64748b", fontSize: "14px" }}>
-          {new Date(blog.createdAt).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </p>
-      </header>
+          <span className="article-eyebrow">
+            DEVELOPER KNOWLEDGE HUB
+          </span>
 
-      {blog.excerpt && (
-        <p
-          style={{
-            fontSize: "18px",
-            color: "#475569",
-            lineHeight: "1.7",
-            marginTop: "25px",
-          }}
-        >
-          {blog.excerpt}
-        </p>
-      )}
+          <h1>{blog.title}</h1>
 
-      <article
-        style={{
-          marginTop: "35px",
-          lineHeight: "1.8",
-          fontSize: "16px",
-          color: "#334155",
-        }}
-      >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {blog.content}
-        </ReactMarkdown>
+          {blog.excerpt && (
+            <p className="article-excerpt">
+              {blog.excerpt}
+            </p>
+          )}
+
+          {/* Author Information */}
+          <div className="article-author">
+
+            <div className="article-author-avatar">
+              {blog.user.name?.charAt(0).toUpperCase() || "U"}
+            </div>
+
+            <div className="article-author-info">
+              <strong>{blog.user.name}</strong>
+              <span>Community Contributor</span>
+            </div>
+
+            <div className="article-meta-divider" />
+
+            <div className="article-date">
+              <span>Published on</span>
+              <strong>{formattedDate}</strong>
+            </div>
+
+          </div>
+        </header>
+
+        {/* Cover Image */}
+        {blog.coverImage && (
+          <div className="article-cover-wrapper">
+            <img
+              src={blog.coverImage}
+              alt={blog.title}
+              className="article-cover"
+            />
+          </div>
+        )}
+
+        {/* Article Content */}
+        <div className="article-content-wrapper">
+
+          <div className="article-content-heading">
+            <span className="article-content-label">
+              THE STORY
+            </span>
+
+            <h2>Explore the article</h2>
+          </div>
+
+          <div className="article-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {blog.content}
+            </ReactMarkdown>
+          </div>
+
+        </div>
+
+        {/* Bottom Section */}
+        <footer className="article-footer">
+          <div>
+            <span className="article-footer-icon">✦</span>
+            <h3>Enjoyed this article?</h3>
+            <p>
+              Keep learning, building and sharing with the DevConnect
+              community.
+            </p>
+          </div>
+
+          <Link to="/blogs" className="article-explore-btn">
+            Explore More Articles →
+          </Link>
+        </footer>
+
       </article>
 
-    </div>
+      {/* Page Footer */}
+      <footer className="article-page-footer">
+        Made for developers, built for connections. ✦
+      </footer>
+
+    </main>
   );
 };
 

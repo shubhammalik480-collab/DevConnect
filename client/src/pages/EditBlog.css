@@ -1,0 +1,621 @@
+/* ===========================
+   EDIT BLOG PAGE
+=========================== */
+
+.edit-blog-page {
+  min-height: 100vh;
+  padding: 45px 30px;
+  background: #f5f6fb;
+  color: #172033;
+  font-family: inherit;
+}
+
+.edit-page-header {
+  max-width: 1500px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.edit-eyebrow {
+  display: block;
+  color: #7777ed;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.edit-page-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.edit-page-header p {
+  color: #8491a7;
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.edit-back-btn {
+  border: none;
+  background: #eef0ff;
+  color: #5146e5;
+  padding: 13px 20px;
+  border-radius: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+.edit-back-btn:hover {
+  background: #e1e5ff;
+}
+
+/* ===========================
+   MAIN LAYOUT
+=========================== */
+
+.edit-layout {
+  max-width: 1500px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 25px;
+  align-items: start;
+}
+
+.edit-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.edit-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ===========================
+   PANELS
+=========================== */
+
+.edit-panel {
+  background: #ffffff;
+  border: 1px solid #e9edf5;
+  border-radius: 17px;
+  padding: 27px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.035);
+  min-width: 0;
+}
+
+.edit-panel h2 {
+  color: #172033;
+  font-size: 21px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.edit-panel-description {
+  color: #8491a7;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0 0 23px;
+}
+
+/* ===========================
+   FORM FIELDS
+=========================== */
+
+.edit-form-group {
+  margin-bottom: 23px;
+}
+
+.edit-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.edit-form-group label {
+  display: block;
+  color: #263348;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.edit-form-group label > span:first-child {
+  color: #ef4444;
+}
+
+.edit-form-group .optional-label {
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
+.edit-form-group input,
+.edit-form-group textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 15px;
+  background: #f8f9fd;
+  border: 1px solid #e5eaf3;
+  border-radius: 9px;
+  color: #263348;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: 0.2s;
+}
+
+.edit-form-group input {
+  min-height: 46px;
+}
+
+.edit-form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.edit-form-group input:focus,
+.edit-form-group textarea:focus {
+  border-color: #6255ec;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(98, 85, 236, 0.09);
+}
+
+.edit-form-group input::placeholder,
+.edit-form-group textarea::placeholder {
+  color: #a0aec0;
+}
+
+.edit-form-group small {
+  display: block;
+  text-align: right;
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 7px;
+}
+
+/* ===========================
+   MARKDOWN EDITOR
+=========================== */
+
+.edit-story-panel {
+  padding-bottom: 24px;
+}
+
+.edit-story-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.edit-story-heading .edit-panel-description {
+  margin-bottom: 0;
+}
+
+.edit-word-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 13px;
+  border-radius: 30px;
+  background: #f0f1ff;
+  color: #5b50e8;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.edit-markdown-editor {
+  width: 100%;
+  min-width: 0;
+}
+
+.edit-markdown-editor .w-md-editor {
+  width: 100% !important;
+  border: 1px solid #e5eaf3;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.edit-markdown-editor .w-md-editor-toolbar {
+  background: #f8f9fd;
+  border-bottom: 1px solid #e5eaf3;
+}
+
+.edit-markdown-editor .w-md-editor-content {
+  background: #ffffff;
+}
+
+.edit-editor-tip {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 15px 0 0;
+}
+
+/* ===========================
+   PUBLISH SETTINGS
+=========================== */
+
+.edit-publish-panel h2 {
+  font-size: 20px;
+}
+
+.edit-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #f8f9fd;
+  border-radius: 9px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.edit-status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.edit-status.is-published span {
+  background: #16a34a;
+}
+
+/* Toggle */
+
+.edit-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 23px;
+}
+
+.edit-toggle input {
+  display: none;
+}
+
+.edit-toggle-slider {
+  width: 38px;
+  height: 20px;
+  background: #d9deea;
+  border-radius: 20px;
+  position: relative;
+  flex-shrink: 0;
+  transition: 0.2s;
+}
+
+.edit-toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  top: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.edit-toggle input:checked + .edit-toggle-slider {
+  background: #5b50e8;
+}
+
+.edit-toggle input:checked + .edit-toggle-slider::before {
+  transform: translateX(18px);
+}
+
+/* Summary */
+
+.edit-summary {
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+  padding: 18px 0;
+  margin-bottom: 18px;
+}
+
+.edit-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 13px;
+  font-size: 12px;
+}
+
+.edit-summary div:last-child {
+  margin-bottom: 0;
+}
+
+.edit-summary span {
+  color: #94a3b8;
+}
+
+.edit-summary strong {
+  color: #475569;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Buttons */
+
+.edit-submit-btn,
+.edit-cancel-btn {
+  width: 100%;
+  min-height: 45px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-submit-btn {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(120deg, #5146e5, #6855f5);
+  box-shadow: 0 5px 12px rgba(81, 70, 229, 0.18);
+}
+
+.edit-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(81, 70, 229, 0.25);
+}
+
+.edit-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.edit-cancel-btn {
+  margin-top: 10px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e5eaf3;
+}
+
+.edit-cancel-btn:hover {
+  background: #f8f9fd;
+}
+
+.edit-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error */
+
+.edit-error-message {
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* ===========================
+   WRITING TIPS
+=========================== */
+
+.edit-tips-panel {
+  background: linear-gradient(145deg, #ffffff, #f8f9ff);
+}
+
+.edit-tips-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eeefff;
+  color: #6155ed;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.edit-tips-panel h2 {
+  margin-bottom: 15px;
+}
+
+.edit-tips-panel ul {
+  padding-left: 17px;
+  margin: 0;
+}
+
+.edit-tips-panel li {
+  color: #8491a7;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 11px;
+}
+
+.edit-tips-panel li:last-child {
+  margin-bottom: 0;
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+
+.edit-footer {
+  text-align: center;
+  color: #9aa6b9;
+  font-size: 12px;
+  margin: 35px auto 10px;
+}
+
+/* ===========================
+   LOADING / ERROR PAGE
+=========================== */
+
+.edit-loading,
+.edit-error-page {
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
+  color: #475569;
+  text-align: center;
+  padding: 20px;
+}
+
+.edit-spinner {
+  width: 38px;
+  height: 38px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #5b50e8;
+  border-radius: 50%;
+  animation: edit-spin 0.8s linear infinite;
+}
+
+@keyframes edit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.edit-error-page button {
+  padding: 12px 20px;
+  background: #5146e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ===========================
+   TABLET
+=========================== */
+
+@media (max-width: 1050px) {
+  .edit-layout {
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 18px;
+  }
+
+  .edit-panel {
+    padding: 22px;
+  }
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+  .edit-blog-page {
+    padding: 25px 15px;
+  }
+
+  .edit-page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .edit-page-header h1 {
+    font-size: 27px;
+  }
+
+  .edit-back-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .edit-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .edit-main-column,
+  .edit-sidebar {
+    gap: 18px;
+  }
+
+  .edit-panel {
+    padding: 20px 16px;
+  }
+
+  .edit-panel h2 {
+    font-size: 19px;
+  }
+
+  .edit-form-group input {
+    min-height: 46px;
+  }
+
+  .edit-form-group textarea {
+    min-height: 100px;
+  }
+
+  .edit-markdown-editor .w-md-editor {
+    min-height: 350px;
+  }
+
+  .edit-markdown-editor .w-md-editor-content {
+    min-height: 300px;
+  }
+
+  .edit-story-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .edit-submit-btn,
+  .edit-cancel-btn {
+    min-height: 48px;
+  }
+}
+
+/* ===========================
+   SMALL MOBILE
+=========================== */
+
+@media (max-width: 380px) {
+  .edit-blog-page {
+    padding: 20px 10px;
+  }
+
+  .edit-panel {
+    padding: 17px 13px;
+  }
+
+  .edit-page-header h1 {
+    font-size: 24px;
+  }
+
+  .edit-markdown-editor .w-md-editor {
+    font-size: 12px;
+  }
+}

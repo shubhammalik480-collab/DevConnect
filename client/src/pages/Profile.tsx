@@ -1,14 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
 import { useAuth } from "../context/useAuth";
 import type { User } from "../context/auth.types";
 import { API_BASE_URL } from "../config/api";
+
 import {
   getSkills,
   addSkill,
@@ -23,8 +19,6 @@ import type { Project } from "../services/project.service";
 
 import "./Profile.css";
 
-const API_URL = API_BASE_URL;
-
 interface Skill {
   id: string;
   name: string;
@@ -34,29 +28,24 @@ interface Skill {
 const Profile = () => {
   const { user, updateUser } = useAuth();
 
-  // Profile states
   const [isEditing, setIsEditing] = useState(false);
 
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [location, setLocation] = useState(user?.location || "");
-
   const [image, setImage] = useState<File | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Skills states
   const [skills, setSkills] = useState<Skill[]>([]);
   const [skillsLoading, setSkillsLoading] = useState(true);
 
   const [skillName, setSkillName] = useState("");
   const [skillLevel, setSkillLevel] = useState("Intermediate");
-
   const [addingSkill, setAddingSkill] = useState(false);
   const [skillError, setSkillError] = useState("");
 
-  // Projects states
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
 
@@ -107,20 +96,13 @@ const Profile = () => {
     }
   }, []);
 
-  // Load Skills and Projects
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void fetchSkills();
-      void fetchProjects();
-    }, 0);
-
-    return () => window.clearTimeout(timer);
+    void fetchSkills();
+    void fetchProjects();
   }, [fetchSkills, fetchProjects]);
 
   // Add Skill
-  const handleAddSkill = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleAddSkill = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!skillName.trim()) {
@@ -137,11 +119,7 @@ const Profile = () => {
         skillLevel
       );
 
-      setSkills((previousSkills) => [
-        newSkill,
-        ...previousSkills,
-      ]);
-
+      setSkills((previous) => [newSkill, ...previous]);
       setSkillName("");
       setSkillLevel("Intermediate");
     } catch (error) {
@@ -156,9 +134,7 @@ const Profile = () => {
   };
 
   // Add Project
-  const handleAddProject = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleAddProject = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!projectTitle.trim() || !projectDescription.trim()) {
@@ -181,19 +157,16 @@ const Profile = () => {
 
         liveUrl: projectLiveUrl.trim() || undefined,
 
-        repositoryUrl:
-          projectRepositoryUrl.trim() || undefined,
+        repositoryUrl: projectRepositoryUrl.trim() || undefined,
       });
 
-      setProjects((previousProjects) => [
-        newProject,
-        ...previousProjects,
-      ]);
+      setProjects((previous) => [newProject, ...previous]);
 
       setProjectTitle("");
       setProjectDescription("");
       setProjectTechStack("");
       setProjectLiveUrl("");
+      setProjectRepositoryUrl("");
     } catch (error) {
       setProjectError(
         error instanceof Error
@@ -205,22 +178,18 @@ const Profile = () => {
     }
   };
 
-  // Open Edit Profile Form
+  // Edit Profile
   const handleEdit = () => {
     setName(user?.name || "");
     setBio(user?.bio || "");
     setLocation(user?.location || "");
-
     setImage(null);
     setError("");
-
     setIsEditing(true);
   };
 
   // Save Profile
-  const handleSave = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+  const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setSaving(true);
@@ -228,16 +197,13 @@ const Profile = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/users/profile`,
+        `${API_BASE_URL}/users/profile`,
         {
           method: "PUT",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           credentials: "include",
-
           body: JSON.stringify({
             name,
             bio,
@@ -259,14 +225,13 @@ const Profile = () => {
         ...data.data,
       };
 
-      // Upload profile image
+      // Upload Profile Image
       if (image) {
         const formData = new FormData();
-
         formData.append("image", image);
 
         const imageResponse = await fetch(
-          `${API_URL}/users/profile/image`,
+          `${API_BASE_URL}/users/profile/image`,
           {
             method: "POST",
             credentials: "include",
@@ -306,325 +271,488 @@ const Profile = () => {
   };
 
   if (!user) {
-    return <h2>Loading profile...</h2>;
+    return (
+      <div className="profile-loading">
+        <div className="profile-spinner" />
+        <p>Loading your profile...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="profile-container">
+    <main className="profile-page">
 
-      {/* Hero Section */}
-      <section className="profile-hero">
+      <div className="profile-content">
 
-        <div className="profile-avatar">
+        {/* Page Heading */}
+        <header className="profile-page-header">
+          <div>
+            <span className="profile-eyebrow">
+              YOUR DEVELOPER IDENTITY
+            </span>
 
-          {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user.name}
-            />
-          ) : (
-            <div className="avatar-placeholder">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+            <h1>My Profile</h1>
 
-        </div>
+            <p>
+              Manage your profile, showcase your skills and
+              highlight the projects you've built.
+            </p>
+          </div>
 
-        <div className="profile-info">
-
-          <h1>{user.name}</h1>
-
-          <p>{user.email}</p>
-
-          <p>{user.bio || "No bio added yet."}</p>
-
-          <p>{user.location || "Location not added"}</p>
-
-          <button onClick={handleEdit}>
-            Edit Profile
+          <button
+            className="profile-edit-btn"
+            onClick={handleEdit}
+          >
+            ✎ Edit Profile
           </button>
+        </header>
 
-        </div>
+        {/* Profile Hero */}
+        <section className="profile-hero">
 
-      </section>
+          <div className="profile-cover">
+            <span className="profile-cover-code">
+              {"</>"}
+            </span>
+          </div>
 
-      {/* Edit Profile Form */}
-      {isEditing && (
+          <div className="profile-hero-content">
 
+            <div className="profile-avatar">
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} />
+              ) : (
+                <div className="avatar-placeholder">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            <div className="profile-info">
+
+              <div className="profile-name-row">
+                <h2>{user.name}</h2>
+                <span className="profile-member-badge">
+                  ✓ DevConnect Member
+                </span>
+              </div>
+
+              <p className="profile-email">
+                {user.email}
+              </p>
+
+              <p className="profile-bio">
+                {user.bio || "Add a bio to tell the community about yourself."}
+              </p>
+
+              <p className="profile-location">
+                📍 {user.location || "Location not added"}
+              </p>
+
+            </div>
+
+          </div>
+
+          {/* Profile Statistics */}
+          <div className="profile-statistics">
+
+            <div className="profile-stat">
+              <strong>{projects.length}</strong>
+              <span>Projects</span>
+            </div>
+
+            <div className="profile-stat">
+              <strong>{skills.length}</strong>
+              <span>Skills</span>
+            </div>
+
+            <div className="profile-stat">
+              <strong>{projects.length + skills.length}</strong>
+              <span>Contributions</span>
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* Edit Profile Form */}
+        {isEditing && (
+          <section className="profile-section">
+
+            <div className="profile-section-heading">
+              <div>
+                <span className="profile-eyebrow">
+                  PERSONAL INFORMATION
+                </span>
+                <h2>Edit Your Profile</h2>
+              </div>
+            </div>
+
+            <form
+              className="profile-form"
+              onSubmit={handleSave}
+            >
+
+              <div className="profile-form-grid">
+
+                <div className="profile-form-group">
+                  <label>Name</label>
+
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="profile-form-group">
+                  <label>Location</label>
+
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Enter your location"
+                  />
+                </div>
+
+                <div className="profile-form-group full-width">
+                  <label>Bio</label>
+
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Write something about yourself..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="profile-form-group full-width">
+                  <label>Profile Picture</label>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setImage(e.target.files?.[0] || null)
+                    }
+                  />
+
+                  {image && (
+                    <small className="profile-file-name">
+                      Selected: {image.name}
+                    </small>
+                  )}
+                </div>
+
+              </div>
+
+              {error && (
+                <p className="profile-error">{error}</p>
+              )}
+
+              <div className="profile-form-actions">
+
+                <button
+                  type="submit"
+                  className="profile-primary-btn"
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+
+                <button
+                  type="button"
+                  className="profile-cancel-btn"
+                  onClick={() => setIsEditing(false)}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+
+              </div>
+
+            </form>
+          </section>
+        )}
+
+        {/* Skills Section */}
         <section className="profile-section">
 
-          <h2>Edit Your Profile</h2>
-
-          <form onSubmit={handleSave}>
-
+          <div className="profile-section-heading">
             <div>
-              <label>Name</label>
+              <span className="profile-eyebrow">
+                WHAT I WORK WITH
+              </span>
 
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+              <h2>My Skills</h2>
 
-            <div>
-              <label>Bio</label>
-
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Write something about yourself..."
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <label>Location</label>
-
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Enter your location"
-              />
-            </div>
-
-            <div>
-              <label>Profile Picture</label>
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setImage(e.target.files?.[0] || null)
-                }
-              />
-            </div>
-
-            {error && (
-              <p style={{ color: "red" }}>
-                {error}
+              <p>
+                Showcase the technologies and tools you know.
               </p>
-            )}
+            </div>
+
+            <span className="profile-count">
+              {skills.length} Skills
+            </span>
+          </div>
+
+          <form
+            className="profile-add-form"
+            onSubmit={handleAddSkill}
+          >
+
+            <input
+              type="text"
+              placeholder="Enter skill (e.g. C++, React)"
+              value={skillName}
+              onChange={(e) => setSkillName(e.target.value)}
+            />
+
+            <select
+              value={skillLevel}
+              onChange={(e) => setSkillLevel(e.target.value)}
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
 
             <button
               type="submit"
-              disabled={saving}
+              className="profile-primary-btn"
+              disabled={addingSkill}
             >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              disabled={saving}
-            >
-              Cancel
+              {addingSkill ? "Adding..." : "+ Add Skill"}
             </button>
 
           </form>
 
+          {skillError && (
+            <p className="profile-error">{skillError}</p>
+          )}
+
+          {skillsLoading ? (
+            <p className="profile-muted">Loading skills...</p>
+          ) : skills.length === 0 ? (
+            <div className="profile-empty">
+              <span>✦</span>
+              <h3>No skills added yet</h3>
+              <p>Add your first skill to showcase your expertise.</p>
+            </div>
+          ) : (
+
+            <div className="skills-grid">
+
+              {skills.map((skill) => (
+                <article className="skill-card" key={skill.id}>
+
+                  <div className="skill-card-icon">✦</div>
+
+                  <div>
+                    <h3>{skill.name}</h3>
+                    <p>{skill.level || "Level not specified"}</p>
+                  </div>
+
+                </article>
+              ))}
+
+            </div>
+
+          )}
+
         </section>
 
-      )}
+        {/* Projects Section */}
+        <section className="profile-section">
 
-      {/* Skills Section */}
-      <section className="profile-section">
+          <div className="profile-section-heading">
+            <div>
+              <span className="profile-eyebrow">
+                BUILT WITH PASSION
+              </span>
 
-        <h2>My Skills</h2>
+              <h2>My Projects</h2>
 
-        <form onSubmit={handleAddSkill}>
+              <p>
+                Share your work and let the community explore your projects.
+              </p>
+            </div>
 
-          <input
-            type="text"
-            placeholder="Enter skill (e.g. C++, React)"
-            value={skillName}
-            onChange={(e) => setSkillName(e.target.value)}
-          />
-
-          <select
-            value={skillLevel}
-            onChange={(e) => setSkillLevel(e.target.value)}
-          >
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
-
-          <button
-            type="submit"
-            disabled={addingSkill}
-          >
-            {addingSkill ? "Adding..." : "Add Skill"}
-          </button>
-
-        </form>
-
-        {skillError && (
-          <p style={{ color: "red" }}>
-            {skillError}
-          </p>
-        )}
-
-        {skillsLoading ? (
-          <p>Loading skills...</p>
-        ) : skills.length === 0 ? (
-          <p>No skills added yet. Add your first skill!</p>
-        ) : (
-
-          <div className="skills-grid">
-
-            {skills.map((skill) => (
-              <div
-                className="skill-card"
-                key={skill.id}
-              >
-                <h3>{skill.name}</h3>
-
-                <p>
-                  {skill.level || "Level not specified"}
-                </p>
-              </div>
-            ))}
-
+            <span className="profile-count">
+              {projects.length} Projects
+            </span>
           </div>
 
-        )}
-
-      </section>
-
-      {/* Projects Section */}
-      <section className="profile-section">
-
-        <h2>My Projects</h2>
-
-        <form onSubmit={handleAddProject}>
-
-          <input
-            type="text"
-            placeholder="Project title"
-            value={projectTitle}
-            onChange={(e) =>
-              setProjectTitle(e.target.value)
-            }
-            required
-          />
-
-          <textarea
-            placeholder="Project description"
-            value={projectDescription}
-            onChange={(e) =>
-              setProjectDescription(e.target.value)
-            }
-            rows={3}
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Tech stack (React, Node.js, MongoDB)"
-            value={projectTechStack}
-            onChange={(e) =>
-              setProjectTechStack(e.target.value)
-            }
-          />
-
-          <input
-            type="url"
-            placeholder="Live project URL (optional)"
-            value={projectLiveUrl}
-            onChange={(e) =>
-              setProjectLiveUrl(e.target.value)
-            }
-          />
-
-          <input
-            type="url"
-            placeholder="GitHub repository URL (optional)"
-            value={projectRepositoryUrl}
-            onChange={(e) =>
-              setProjectRepositoryUrl(e.target.value)
-            }
-          />
-
-          <button
-            type="submit"
-            disabled={addingProject}
+          <form
+            className="profile-project-form"
+            onSubmit={handleAddProject}
           >
-            {addingProject ? "Adding..." : "Add Project"}
-          </button>
 
-        </form>
+            <div className="profile-form-group">
+              <label>Project Title</label>
 
-        {projectError && (
-          <p style={{ color: "red" }}>
-            {projectError}
-          </p>
-        )}
+              <input
+                type="text"
+                placeholder="Enter project title"
+                value={projectTitle}
+                onChange={(e) => setProjectTitle(e.target.value)}
+                required
+              />
+            </div>
 
-        {projectsLoading ? (
-          <p>Loading projects...</p>
-        ) : projects.length === 0 ? (
-          <p>No projects added yet. Add your first project!</p>
-        ) : (
+            <div className="profile-form-group">
+              <label>Project Description</label>
 
-          <div className="projects-grid">
+              <textarea
+                placeholder="Describe your project..."
+                value={projectDescription}
+                onChange={(e) =>
+                  setProjectDescription(e.target.value)
+                }
+                rows={3}
+                required
+              />
+            </div>
 
-            {projects.map((project) => (
-              <div
-                className="project-card"
-                key={project.id}
-              >
+            <div className="profile-form-group">
+              <label>Tech Stack</label>
 
-                <h3>{project.title}</h3>
+              <input
+                type="text"
+                placeholder="React, Node.js, MongoDB"
+                value={projectTechStack}
+                onChange={(e) =>
+                  setProjectTechStack(e.target.value)
+                }
+              />
 
-                <p>{project.description}</p>
+              <small>Separate technologies with commas.</small>
+            </div>
 
-                <div className="project-tags">
+            <div className="profile-form-grid">
 
-                  {project.techStack.map((tech, index) => (
-                    <span key={`${project.id}-${index}`}>
-                      {tech}
-                    </span>
-                  ))}
+              <div className="profile-form-group">
+                <label>Live Project URL</label>
 
-                </div>
-
-                <div className="project-links">
-
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Live Demo
-                    </a>
-                  )}
-
-                  {project.repositoryUrl && (
-                    <a
-                      href={project.repositoryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      GitHub Repository
-                    </a>
-                  )}
-
-                </div>
-
+                <input
+                  type="url"
+                  placeholder="https://example.com"
+                  value={projectLiveUrl}
+                  onChange={(e) =>
+                    setProjectLiveUrl(e.target.value)
+                  }
+                />
               </div>
-            ))}
 
-          </div>
+              <div className="profile-form-group">
+                <label>GitHub Repository</label>
 
-        )}
+                <input
+                  type="url"
+                  placeholder="https://github.com/..."
+                  value={projectRepositoryUrl}
+                  onChange={(e) =>
+                    setProjectRepositoryUrl(e.target.value)
+                  }
+                />
+              </div>
 
-      </section>
+            </div>
 
-    </div>
+            {projectError && (
+              <p className="profile-error">{projectError}</p>
+            )}
+
+            <button
+              type="submit"
+              className="profile-primary-btn"
+              disabled={addingProject}
+            >
+              {addingProject ? "Adding Project..." : "+ Add Project"}
+            </button>
+
+          </form>
+
+          {/* Project Cards */}
+          {projectsLoading ? (
+            <p className="profile-muted">Loading projects...</p>
+          ) : projects.length === 0 ? (
+
+            <div className="profile-empty">
+              <span>⌘</span>
+              <h3>No projects added yet</h3>
+              <p>Your projects will appear here once you add them.</p>
+            </div>
+
+          ) : (
+
+            <div className="projects-grid">
+
+              {projects.map((project) => (
+                <article
+                  className="project-card"
+                  key={project.id}
+                >
+
+                  <div className="project-card-icon">
+                    {"</>"}
+                  </div>
+
+                  <h3>{project.title}</h3>
+
+                  <p>{project.description}</p>
+
+                  <div className="project-tags">
+
+                    {project.techStack.map((tech, index) => (
+                      <span key={`${project.id}-${index}`}>
+                        {tech}
+                      </span>
+                    ))}
+
+                  </div>
+
+                  <div className="project-links">
+
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Live Demo ↗
+                      </a>
+                    )}
+
+                    {project.repositoryUrl && (
+                      <a
+                        href={project.repositoryUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        GitHub Repository ↗
+                      </a>
+                    )}
+
+                  </div>
+
+                </article>
+              ))}
+
+            </div>
+
+          )}
+
+        </section>
+
+        <footer className="profile-footer">
+          Made for developers, built for connections. ✦
+        </footer>
+
+      </div>
+    </main>
   );
 };
 

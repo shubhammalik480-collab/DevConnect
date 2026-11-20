@@ -133,110 +133,195 @@ const Connections = () => {
     </div>
   );
 
+  const tabs: { id: Tab; label: string; icon: string; count: number }[] = [
+    {
+      id: "received",
+      label: "Received Requests",
+      icon: "📩",
+      count: receivedRequests.length,
+    },
+    {
+      id: "sent",
+      label: "Sent Requests",
+      icon: "📤",
+      count: sentRequests.length,
+    },
+    {
+      id: "connections",
+      label: "My Connections",
+      icon: "🤝",
+      count: connections.length,
+    },
+  ];
+
   return (
     <main className="connections-page">
       <div className="connections-container">
-        <header className="connections-header">
-          <h1>My Connections</h1>
-          <p>
-            Manage your developer network and connection requests.
-          </p>
+
+        {/* Hero Section */}
+        <header className="connections-hero">
+          <div>
+            <span className="connections-eyebrow">
+              YOUR PROFESSIONAL NETWORK
+            </span>
+
+            <h1>My Connections</h1>
+
+            <p>
+              Build meaningful relationships, connect with developers
+              and grow together.
+            </p>
+          </div>
+
+          <div className="connections-hero-decoration">
+            {"</>"}
+          </div>
         </header>
 
+        {/* Statistics */}
         <section className="connections-stats">
-          {[
-            {
-              label: "Received Requests",
-              count: receivedRequests.length,
-            },
-            {
-              label: "Sent Requests",
-              count: sentRequests.length,
-            },
-            {
-              label: "My Connections",
-              count: connections.length,
-            },
-          ].map((item) => (
-            <div className="connection-stat-card" key={item.label}>
-              <h2>{item.count}</h2>
-              <p>{item.label}</p>
+
+          <div className="connection-stat-card">
+            <div className="stat-icon received-icon">📩</div>
+            <div>
+              <h2>{receivedRequests.length}</h2>
+              <p>Received Requests</p>
             </div>
-          ))}
+          </div>
+
+          <div className="connection-stat-card">
+            <div className="stat-icon sent-icon">📤</div>
+            <div>
+              <h2>{sentRequests.length}</h2>
+              <p>Sent Requests</p>
+            </div>
+          </div>
+
+          <div className="connection-stat-card">
+            <div className="stat-icon connected-icon">🤝</div>
+            <div>
+              <h2>{connections.length}</h2>
+              <p>My Connections</p>
+            </div>
+          </div>
+
         </section>
 
-        <div className="connections-tabs">
-          {[
-            { id: "received", label: "Received Requests" },
-            { id: "sent", label: "Sent Requests" },
-            { id: "connections", label: "My Connections" },
-          ].map((tab) => (
+        {/* Main Content */}
+        <section className="connections-content">
+
+          <div className="connections-section-header">
+            <div>
+              <span className="section-eyebrow">
+                NETWORK MANAGEMENT
+              </span>
+
+              <h2>Manage your network</h2>
+
+              <p>
+                View and manage all your connection activities.
+              </p>
+            </div>
+
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as Tab)}
-              className={
-                activeTab === tab.id
-                  ? "connection-tab active"
-                  : "connection-tab"
-              }
+              onClick={() => void loadConnections()}
+              disabled={loading}
+              className="refresh-btn"
             >
-              {tab.label}
+              ↻ {loading ? "Refreshing..." : "Refresh"}
             </button>
-          ))}
-        </div>
+          </div>
 
-        <div className="connections-refresh">
-          <button
-            onClick={() => void loadConnections()}
-            disabled={loading}
-            className="refresh-btn"
-          >
-            ↻ Refresh
-          </button>
-        </div>
+          {/* Tabs */}
+          <div className="connections-tabs" role="tablist">
 
-        {message && (
-          <p className="connection-success">{message}</p>
-        )}
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={
+                  activeTab === tab.id
+                    ? "connection-tab active"
+                    : "connection-tab"
+                }
+              >
+                <span>{tab.icon}</span>
+                {tab.label}
 
-        {error && (
-          <p className="connection-error">{error}</p>
-        )}
+                <span className="tab-count">
+                  {tab.count}
+                </span>
+              </button>
+            ))}
 
-        {loading ? (
-          <h3 className="connections-message">
-            Loading connections...
-          </h3>
-        ) : (
-          <section className="connections-list">
-            {activeTab === "received" && (
-              <>
-                {receivedRequests.length === 0 ? (
-                  <p className="connections-empty">
-                    No pending connection requests.
-                  </p>
+          </div>
+
+          {/* Notifications */}
+          {message && (
+            <div className="connection-success">
+              <span>✓</span>
+              {message}
+            </div>
+          )}
+
+          {error && (
+            <div className="connection-error">
+              <span>!</span>
+              {error}
+            </div>
+          )}
+
+          {/* Connection List */}
+          {loading ? (
+            <div className="connections-loading">
+              <div className="connections-spinner" />
+              <h3>Loading your network...</h3>
+              <p>Please wait while we fetch your connections.</p>
+            </div>
+          ) : (
+            <div className="connections-list">
+
+              {/* Received Requests */}
+              {activeTab === "received" && (
+                receivedRequests.length === 0 ? (
+                  <div className="connections-empty">
+                    <div className="empty-icon">📩</div>
+                    <h3>No pending requests</h3>
+                    <p>
+                      When developers send you connection requests,
+                      they will appear here.
+                    </p>
+                  </div>
                 ) : (
                   receivedRequests.map((request) => (
                     <article
                       key={request.id}
                       className="connection-card"
                     >
-                      {renderDeveloper(request.requester)}
+                      <div className="connection-card-main">
+                        {renderDeveloper(request.requester)}
+
+                        <span className="connection-status pending">
+                          ● Pending Request
+                        </span>
+                      </div>
 
                       <div className="connection-actions">
                         <button
                           onClick={() => handleAccept(request.id)}
-                          disabled={actionLoading === request.id}
+                          disabled={actionLoading !== null}
                           className="accept-btn"
                         >
                           {actionLoading === request.id
                             ? "Processing..."
-                            : "Accept"}
+                            : "✓ Accept"}
                         </button>
 
                         <button
                           onClick={() => handleReject(request.id)}
-                          disabled={actionLoading === request.id}
+                          disabled={actionLoading !== null}
                           className="reject-btn"
                         >
                           Reject
@@ -244,57 +329,77 @@ const Connections = () => {
                       </div>
                     </article>
                   ))
-                )}
-              </>
-            )}
+                )
+              )}
 
-            {activeTab === "sent" && (
-              <>
-                {sentRequests.length === 0 ? (
-                  <p className="connections-empty">
-                    You have not sent any pending requests.
-                  </p>
+              {/* Sent Requests */}
+              {activeTab === "sent" && (
+                sentRequests.length === 0 ? (
+                  <div className="connections-empty">
+                    <div className="empty-icon">📤</div>
+                    <h3>No sent requests</h3>
+                    <p>
+                      Connection requests you send to developers
+                      will appear here.
+                    </p>
+                  </div>
                 ) : (
                   sentRequests.map((request) => (
                     <article
                       key={request.id}
                       className="connection-card"
                     >
-                      {renderDeveloper(request.receiver)}
+                      <div className="connection-card-main">
+                        {renderDeveloper(request.receiver)}
 
-                      <span className="connection-status pending">
-                        ⏳ Pending
-                      </span>
+                        <span className="connection-status pending">
+                          ⏳ Awaiting Response
+                        </span>
+                      </div>
                     </article>
                   ))
-                )}
-              </>
-            )}
+                )
+              )}
 
-            {activeTab === "connections" && (
-              <>
-                {connections.length === 0 ? (
-                  <p className="connections-empty">
-                    You have no connections yet.
-                  </p>
+              {/* Accepted Connections */}
+              {activeTab === "connections" && (
+                connections.length === 0 ? (
+                  <div className="connections-empty">
+                    <div className="empty-icon">🤝</div>
+                    <h3>Your network starts here!</h3>
+                    <p>
+                      Discover developers and build your professional
+                      network on DevConnect.
+                    </p>
+                  </div>
                 ) : (
                   connections.map((connection) => (
                     <article
                       key={connection.id}
                       className="connection-card"
                     >
-                      {renderDeveloper(connection.developer)}
+                      <div className="connection-card-main">
+                        {renderDeveloper(connection.developer)}
 
-                      <span className="connection-status connected">
-                        ✓ Connected
-                      </span>
+                        <span className="connection-status connected">
+                          ✓ Connected
+                        </span>
+                      </div>
                     </article>
                   ))
-                )}
-              </>
-            )}
-          </section>
-        )}
+                )
+              )}
+
+            </div>
+          )}
+
+        </section>
+
+        {/* Footer */}
+        <footer className="connections-footer">
+          Made for developers, built for connections. ✦
+        </footer>
+
       </div>
     </main>
   );
