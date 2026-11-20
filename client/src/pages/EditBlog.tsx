@@ -13,7 +13,9 @@ import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import "./EditBlog.css";
 
-const MDEditor = lazy(() => import("@uiw/react-md-editor"));
+const MDEditor = lazy(
+  () => import("@uiw/react-md-editor/nohighlight")
+);
 
 const EditBlog = () => {
   const { slug } = useParams<{ slug: string }>();

@@ -132,9 +132,12 @@ const BlogDetails = () => {
         {blog.coverImage && (
           <div className="article-cover-wrapper">
             <img
-              src={blog.coverImage}
-              alt={blog.title}
-              className="article-cover"
+            src={blog.coverImage}
+            alt={`${blog.title} - Blog cover`}
+            className="article-cover"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
             />
           </div>
         )}

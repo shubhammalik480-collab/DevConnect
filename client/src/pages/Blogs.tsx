@@ -175,10 +175,11 @@ const Blogs = () => {
                 <div className="blog-card-cover">
                   {blog.coverImage ? (
                     <img
-                      src={blog.coverImage}
-                      alt={blog.title}
-                      loading="lazy"
-                    />
+                    src={blog.coverImage}
+                    alt={`${blog.title} - Blog cover`}
+                    loading="lazy"
+                    decoding="async"
+                      />
                   ) : (
                     <div className="blog-cover-placeholder">
                       <span>{"</>"}</span>
@@ -220,10 +221,11 @@ const Blogs = () => {
 
                     {blog.user.avatar ? (
                       <img
-                        src={blog.user.avatar}
-                        alt={blog.user.name}
-                        loading="lazy"
-                      />
+                      src={blog.user.avatar}
+                      alt={`${blog.user.name} profile`}
+                      loading="lazy"
+                      decoding="async"
+                        />
                     ) : (
                       <div className="blog-author-placeholder">
                         {blog.user.name?.charAt(0).toUpperCase() || "U"}

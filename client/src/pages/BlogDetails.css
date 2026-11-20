@@ -1,3 +1,4 @@
+
 /* =================================
    BLOG DETAILS PAGE
 ================================= */
@@ -157,18 +158,21 @@
 }
 
 /* =================================
-   COVER IMAGE
+   COVER IMAGE - OPTIMIZED
 ================================= */
 
 .article-cover-wrapper {
   padding: 0 55px;
+  width: 100%;
 }
 
 .article-cover {
   display: block;
   width: 100%;
+  aspect-ratio: 16 / 9;
   max-height: 480px;
   object-fit: cover;
+  object-position: center;
   border-radius: 15px;
   background: #eef0ff;
 }
@@ -257,6 +261,7 @@
   color: #5145e5;
   font-weight: 600;
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .article-markdown a:hover {
@@ -286,6 +291,7 @@
   background: #172033;
   border-radius: 12px;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .article-markdown pre code {
@@ -296,9 +302,11 @@
 }
 
 .article-markdown img {
+  display: block;
   max-width: 100%;
   height: auto;
   border-radius: 12px;
+  margin: 20px auto;
 }
 
 .article-markdown table {
@@ -560,6 +568,7 @@
   }
 
   .article-cover {
+    aspect-ratio: 16 / 9;
     max-height: 250px;
     border-radius: 10px;
   }
@@ -602,5 +611,25 @@
 
   .article-explore-btn {
     width: 100%;
+  }
+}
+
+/* =================================
+   ACCESSIBILITY
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .article-back-link,
+  .article-explore-btn {
+    transition: none;
+  }
+
+  .article-back-link:hover,
+  .article-explore-btn:hover {
+    transform: none;
+  }
+
+  .blog-details-spinner {
+    animation-duration: 1.5s;
   }
 }
